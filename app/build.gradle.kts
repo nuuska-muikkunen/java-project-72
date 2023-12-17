@@ -31,6 +31,8 @@ dependencies {
     implementation("gg.jte:jte:3.0.1")
     implementation("org.apache.commons:commons-lang3:3.13.0")
     testImplementation("org.jacoco:org.jacoco.core:0.8.10")
+    implementation("com.h2database:h2:2.2.220")
+    implementation("com.zaxxer:HikariCP:5.0.1")
     testImplementation("org.assertj:assertj-core:3.24.2")
     testImplementation(platform("org.junit:junit-bom:5.10.0"))
     testImplementation("org.junit.jupiter:junit-jupiter:5.10.0")
