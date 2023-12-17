@@ -14,7 +14,7 @@ public class UrlsRepository extends BaseRepository {
         try (var conn = dataSource.getConnection();
              var preparedStatement = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
             preparedStatement.setString(1, url.getName());
-            preparedStatement.setDate(2, url.getCreatedAt());
+            preparedStatement.setTimestamp(2, url.getCreatedAt());
             preparedStatement.executeUpdate();
             var generatedKeys = preparedStatement.getGeneratedKeys();
             // Устанавливаем ID в сохраненную сущность
@@ -34,7 +34,7 @@ public class UrlsRepository extends BaseRepository {
             var resultSet = stmt.executeQuery();
             if (resultSet.next()) {
                 var name = resultSet.getString("name");
-                var createdAt = resultSet.getDate("created_at");
+                var createdAt = resultSet.getTimestamp("created_at");
                 var car = new Url(name, createdAt);
                 car.setId(id);
                 return Optional.of(car);
@@ -52,7 +52,7 @@ public class UrlsRepository extends BaseRepository {
             while (resultSet.next()) {
                 var id = resultSet.getLong("id");
                 var name = resultSet.getString("name");
-                var createdAt = resultSet.getDate("created_at");
+                var createdAt = resultSet.getTimestamp("created_at");
                 var car = new Url(name, createdAt);
                 car.setId(id);
                 result.add(car);

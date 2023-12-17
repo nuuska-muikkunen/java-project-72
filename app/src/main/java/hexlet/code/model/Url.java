@@ -4,7 +4,7 @@ import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
 
-import java.sql.Date;
+import java.sql.Timestamp;
 
 @Getter
 @Setter
@@ -14,9 +14,9 @@ public class Url {
 
     @ToString.Include
     private String name;
-    private Date createdAt;
+    private Timestamp createdAt;
 
-    public Url(String name, Date createdAt) {
+    public Url(String name, Timestamp createdAt) {
         this.name = name;
         this.createdAt = createdAt;
     }

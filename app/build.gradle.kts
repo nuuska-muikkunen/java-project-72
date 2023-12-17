@@ -6,12 +6,12 @@ plugins {
     id("application")
     id("checkstyle")
     id("jacoco")
-
+    id ("com.github.johnrengelman.shadow") version "8.1.1"
 }
 
-//application {
-//    mainClass.set("hexlet.code.App")
-//}
+application {
+    mainClass.set("hexlet.code.App")
+}
 
 group = "hexlet.code"
 version = "1.0-SNAPSHOT"
@@ -33,6 +33,7 @@ dependencies {
     testImplementation("org.jacoco:org.jacoco.core:0.8.10")
     implementation("com.h2database:h2:2.2.220")
     implementation("com.zaxxer:HikariCP:5.0.1")
+    testImplementation("com.konghq:unirest-java:3.13.0")
     testImplementation("org.assertj:assertj-core:3.24.2")
     testImplementation(platform("org.junit:junit-bom:5.10.0"))
     testImplementation("org.junit.jupiter:junit-jupiter:5.10.0")
