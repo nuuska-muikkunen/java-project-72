@@ -20,4 +20,4 @@ COPY . .
 
 RUN gradle installDist
 
-CMD ./build/install/HexletJavalin/bin/HexletJavalin
+CMD ./build/install/app/bin/app
