@@ -20,20 +20,19 @@ public class App {
     private static TemplateEngine createTemplateEngine() {
         ClassLoader classLoader = App.class.getClassLoader();
         ResourceCodeResolver codeResolver = new ResourceCodeResolver("templates", classLoader);
-        TemplateEngine templateEngine = TemplateEngine.create(codeResolver, ContentType.Html);
-        return templateEngine;
+        return TemplateEngine.create(codeResolver, ContentType.Html);
     }
 
     public static Javalin getApp() throws IOException, SQLException {
 
         var hikariConfig = new HikariConfig();
-//        var dataString = System.getenv("JDBC_DATABASE_URL");
-//        var database = dataString.substring(0, dataString.indexOf('?'));
 
-        hikariConfig.setJdbcUrl("jdbc:h2:mem:hexlet_project;DB_CLOSE_DELAY=-1;");
+        var dataString = System.getenv("JDBC_DATABASE_URL");
+        hikariConfig.setJdbcUrl(dataString + ";DB_CLOSE_DELAY=-1;");
 
         var dataSource = new HikariDataSource(hikariConfig);
         var sql = readResourceFile("schema.sql");
+
         JavalinJte.init(createTemplateEngine());
 
         try (var connection = dataSource.getConnection();
@@ -44,9 +43,11 @@ public class App {
         var app = Javalin.create(config -> {
             config.plugins.enableDevLogging();
         });
+
         app.get("/", ctx -> {
             ctx.result("Hello, World!");
         });
+
         app.get(NamedRoutes.urlsPath(), UrlsController::index);
         app.get(NamedRoutes.buildUrlPath(), UrlsController::build);
         app.get(NamedRoutes.urlPath("{id}"), UrlsController::show);
@@ -55,6 +56,6 @@ public class App {
     }
     public static void main(String[] args) throws SQLException, IOException {
         Javalin app = getApp();
-        app.start(Integer.valueOf(System.getenv("PORT")));
+        app.start(Integer.parseInt(System.getenv("PORT")));
     }
 }
