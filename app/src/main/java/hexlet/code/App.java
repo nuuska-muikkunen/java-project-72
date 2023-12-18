@@ -29,7 +29,10 @@ public class App {
 
         var dataString = System.getenv("JDBC_DATABASE_URL") == null
                 ? "jdbc:h2:mem:project" : System.getenv("JDBC_DATABASE_URL");
-        hikariConfig.setJdbcUrl(dataString + ";DB_CLOSE_DELAY=-1;");
+        if (dataString.contains("h2")) {
+            dataString += ";DB_CLOSE_DELAY=-1;";
+        }
+        hikariConfig.setJdbcUrl(dataString);
 
         var dataSource = new HikariDataSource(hikariConfig);
         var sql = readResourceFile("schema.sql");
