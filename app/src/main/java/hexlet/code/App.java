@@ -27,7 +27,8 @@ public class App {
 
         var hikariConfig = new HikariConfig();
 
-        var dataString = System.getenv("JDBC_DATABASE_URL");
+        var dataString = System.getenv("JDBC_DATABASE_URL") == null
+                ? "jdbc:h2:mem:project" : System.getenv("JDBC_DATABASE_URL");
         hikariConfig.setJdbcUrl(dataString + ";DB_CLOSE_DELAY=-1;");
 
         var dataSource = new HikariDataSource(hikariConfig);
@@ -56,6 +57,7 @@ public class App {
     }
     public static void main(String[] args) throws SQLException, IOException {
         Javalin app = getApp();
-        app.start(Integer.parseInt(System.getenv("PORT")));
+        var portNumber = System.getenv("PORT") == null ? 7070 : Integer.parseInt(System.getenv("PORT"));
+        app.start(portNumber);
     }
 }

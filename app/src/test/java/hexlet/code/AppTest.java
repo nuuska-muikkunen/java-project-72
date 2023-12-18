@@ -19,7 +19,8 @@ public class AppTest {
     @BeforeAll
     public static void beforeAll() throws IOException, SQLException {
         app = App.getApp();
-        app.start(Integer.parseInt(System.getenv("PORT")));
+        var portNumber = System.getenv("PORT") == null ? 7070 : Integer.parseInt(System.getenv("PORT"));
+        app.start(portNumber);
         int port = app.port();
         baseUrl = "http://localhost:" + port;
     }
@@ -42,7 +43,7 @@ public class AppTest {
     void testEnvironment() throws Exception {
         HttpResponse<String> response = Unirest.get(baseUrl + "/").asString();
         String actual = String.valueOf(app.port());
-        String expected = "8080";
+        String expected = "7070";
         assertThat(response.getStatus()).isEqualTo(200);
         assertThat(actual).isEqualTo(expected);
     }
