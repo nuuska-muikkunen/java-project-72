@@ -28,7 +28,7 @@ public class App {
         var hikariConfig = new HikariConfig();
 
         var dataString = System.getenv("JDBC_DATABASE_URL") == null
-                ? "jdbc:h2:mem:project" : System.getenv("JDBC_DATABASE_URL");
+            ? "jdbc:h2:mem:project" : System.getenv("JDBC_DATABASE_URL");
 
         hikariConfig.setJdbcUrl(dataString + ";DB_CLOSE_DELAY=-1;");
 

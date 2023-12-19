@@ -48,4 +48,13 @@ public class AppTest {
         assertThat(actual).isEqualTo(expected);
     }
 
+    @Test
+    void testIndex() throws Exception {
+        HttpResponse<String> response = Unirest.get(baseUrl + "/urls").asString();
+        String actual = response.getBody();
+        String expected = "Сайты";
+        assertThat(response.getStatus()).isEqualTo(200);
+        assertThat(actual).contains(expected);
+    }
+
 }
