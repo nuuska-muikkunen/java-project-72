@@ -17,7 +17,7 @@ public class UrlsController {
     public static void index(Context ctx) throws SQLException {
         var urls = UrlsRepository.getEntities();
         var page = new UrlsPage(urls);
-        ctx.render("resources/templates/index.jte", Collections.singletonMap("page", page));
+        ctx.render("index.jte", Collections.singletonMap("page", page));
     }
 
     public static void show(Context ctx) throws SQLException {
@@ -25,11 +25,11 @@ public class UrlsController {
         var url = UrlsRepository.find(id)
                 .orElseThrow(() -> new NotFoundResponse("Url with id = " + id + " not found"));
         var page = new UrlPage(url);
-        ctx.render("resources/templates/show.jte", Collections.singletonMap("page", page));
+        ctx.render("show.jte", Collections.singletonMap("page", page));
     }
 
     public static void build(Context ctx) {
-        ctx.render("urls/build.jte");
+        ctx.render("build.jte");
     }
 
     public static void create(Context ctx) throws SQLException {

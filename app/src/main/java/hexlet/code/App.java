@@ -29,10 +29,8 @@ public class App {
 
         var dataString = System.getenv("JDBC_DATABASE_URL") == null
                 ? "jdbc:h2:mem:project" : System.getenv("JDBC_DATABASE_URL");
-        if (dataString.contains("h2")) {
-            dataString += ";DB_CLOSE_DELAY=-1;";
-        }
-        hikariConfig.setJdbcUrl(dataString);
+
+        hikariConfig.setJdbcUrl(dataString + ";DB_CLOSE_DELAY=-1;");
 
         var dataSource = new HikariDataSource(hikariConfig);
         var sql = readResourceFile("schema.sql");
@@ -49,7 +47,7 @@ public class App {
         });
 
         app.get("/", ctx -> {
-            ctx.result("Hello, World!");
+            ctx.render("mainPage.jte");
         });
 
         app.get(NamedRoutes.urlsPath(), UrlsController::index);

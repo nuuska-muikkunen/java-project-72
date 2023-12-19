@@ -34,9 +34,9 @@ public class AppTest {
     void testRoot() throws Exception {
         HttpResponse<String> response = Unirest.get(baseUrl + "/").asString();
         String actual = response.getBody();
-        String expected = "Hello, World!";
+        String expected = "Пример";
         assertThat(response.getStatus()).isEqualTo(200);
-        assertThat(actual).isEqualTo(expected);
+        assertThat(actual).contains(expected);
     }
 
     @Test

@@ -3,10 +3,10 @@
 
 @param UrlsPage page
 
-@template.page(
+@template.layout.page(
 page = page,
 content = @`
-    <h1>Курсы</h1>
+    <h1>Сайты</h1>
     <table class="table table-striped">
         @for(var url : page.getUrls())
             <tr>
@@ -22,8 +22,5 @@ content = @`
             </tr>
         @endfor
     </table>
-`,
-footer = @`
-    <p>created by <a href="https://ru.hexlet.io/">Hexlet</a></p>
 `
 )

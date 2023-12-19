@@ -41,3 +41,11 @@ bin/
 
 ### Mac OS ###
 .DS_Store
+
+### Javalin ###
+*.class
+jte-classes
+*.settings
+.factorypath
+bin
+.classpath
