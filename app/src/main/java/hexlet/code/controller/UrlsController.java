@@ -8,15 +8,20 @@ import hexlet.code.model.Url;
 import hexlet.code.repository.UrlsRepository;
 import hexlet.code.util.NamedRoutes;
 
+import java.net.URISyntaxException;
 import java.sql.SQLException;
 import java.time.LocalDateTime;
 import java.util.Collections;
 import java.sql.Timestamp;
+import java.net.URI;
+
 
 public class UrlsController {
     public static void index(Context ctx) throws SQLException {
         var urls = UrlsRepository.getEntities();
         var page = new UrlsPage(urls);
+        page.setFlashType(ctx.consumeSessionAttribute("flash-type"));
+        page.setFlash(ctx.consumeSessionAttribute("flash"));
         ctx.render("index.jte", Collections.singletonMap("page", page));
     }
 
@@ -33,10 +38,23 @@ public class UrlsController {
     }
 
     public static void create(Context ctx) throws SQLException {
-        var name = ctx.formParam("name");
-        var createdAt = ctx.formParam("created_at");
-        var url = new Url(name, Timestamp.valueOf(LocalDateTime.parse(createdAt)));
-        UrlsRepository.save(url);
+        var createdAt = Timestamp.valueOf(LocalDateTime.now());
+        var str = ctx.formParam("url");
+        try {
+            var name = new URI(str).parseServerAuthority();
+            var url = new Url(name.toString(), createdAt);
+            if (UrlsRepository.isInDatabase(str)) {
+                ctx.sessionAttribute("flash-type", "danger");
+                ctx.sessionAttribute("flash", "Страница " + str + " уже существует");
+            } else {
+                UrlsRepository.save(url);
+                ctx.sessionAttribute("flash-type", "success");
+                ctx.sessionAttribute("flash", "Страница успешно добавлена");
+            }
+        } catch (URISyntaxException e) {
+            ctx.sessionAttribute("flash-type", "danger");
+            ctx.sessionAttribute("flash", "Некорректный URL");
+        }
         ctx.redirect(NamedRoutes.urlsPath());
     }
 }

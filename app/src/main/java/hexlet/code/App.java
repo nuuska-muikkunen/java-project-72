@@ -50,10 +50,10 @@ public class App {
             ctx.render("mainPage.jte");
         });
 
-        app.get(NamedRoutes.urlsPath(), UrlsController::index);
-        app.get(NamedRoutes.buildUrlPath(), UrlsController::build);
-        app.get(NamedRoutes.urlPath("{id}"), UrlsController::show);
         app.post(NamedRoutes.urlsPath(), UrlsController::create);
+        app.get(NamedRoutes.urlsPath(), UrlsController::index);
+        app.post(NamedRoutes.buildUrlPath(), UrlsController::build);
+        app.get(NamedRoutes.urlPath("{id}"), UrlsController::show);
         return app;
     }
     public static void main(String[] args) throws SQLException, IOException {

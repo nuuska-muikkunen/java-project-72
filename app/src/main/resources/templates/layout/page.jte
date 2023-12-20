@@ -33,15 +33,9 @@
 </nav>
 
 @if(page != null && page.getFlash() != null)
-    @if(!page.getFlash().contains("8"))
-        <div class="alert alert-success" role="alert">
-            <p>${page.getFlash()}</p>
-        </div>
-    @else
-        <div class="alert alert-warning" role="alert">
-            <p>${page.getFlash()}</p>
-        </div>
-    @endif
+    <div class="alert alert-${page.getFlashType()}" role="alert">
+        ${page.getFlash()}
+    </div>
 @endif
 
 <main class="flex-grow-1">
@@ -51,7 +45,7 @@
 <footer class="footer border-top py-3 mt-5 bg-light">
     <div class="text-center">
         created by
-        <a href="https://ru.hexlet.io/">Hexlet</a>
+        <a href="https://ru.hexlet.io/" target="_blank">Hexlet</a>
     </div>
 </footer>
 
