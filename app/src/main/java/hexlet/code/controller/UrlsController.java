@@ -8,12 +8,12 @@ import hexlet.code.model.Url;
 import hexlet.code.repository.UrlsRepository;
 import hexlet.code.util.NamedRoutes;
 
-import java.net.URISyntaxException;
+import java.net.MalformedURLException;
 import java.sql.SQLException;
 import java.time.LocalDateTime;
 import java.util.Collections;
 import java.sql.Timestamp;
-import java.net.URI;
+import java.net.URL;
 
 
 public class UrlsController {
@@ -33,15 +33,15 @@ public class UrlsController {
         ctx.render("show.jte", Collections.singletonMap("page", page));
     }
 
-    public static void build(Context ctx) {
-        ctx.render("build.jte");
-    }
+//    public static void build(Context ctx) {
+//        ctx.render("build.jte");
+//    }
 
     public static void create(Context ctx) throws SQLException {
         var createdAt = Timestamp.valueOf(LocalDateTime.now());
         var str = ctx.formParam("url");
         try {
-            var name = new URI(str).parseServerAuthority();
+            var name = new URL(str);
             var url = new Url(name.toString(), createdAt);
             if (UrlsRepository.isInDatabase(str)) {
                 ctx.sessionAttribute("flash-type", "danger");
@@ -51,7 +51,7 @@ public class UrlsController {
                 ctx.sessionAttribute("flash-type", "success");
                 ctx.sessionAttribute("flash", "Страница успешно добавлена");
             }
-        } catch (URISyntaxException e) {
+        } catch (MalformedURLException e) {
             ctx.sessionAttribute("flash-type", "danger");
             ctx.sessionAttribute("flash", "Некорректный URL");
         }

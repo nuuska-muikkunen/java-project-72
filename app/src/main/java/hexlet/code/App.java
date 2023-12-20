@@ -26,15 +26,17 @@ public class App {
     public static Javalin getApp() throws IOException, SQLException {
 
         var hikariConfig = new HikariConfig();
-
-        var dataString = System.getenv("JDBC_DATABASE_URL") == null
-            ? "jdbc:h2:mem:project" : System.getenv("JDBC_DATABASE_URL");
-
+        var dataString = System.getenv("JDBC_DATABASE_URL");
+        if (dataString == null) {
+            dataString = "jdbc:h2:mem:project";
+        } else {
+            hikariConfig.setUsername(System.getenv("JDBS_DATABASE_USERNAME"));
+            hikariConfig.setPassword(System.getenv("JDBS_DATABASE_PASSWORD"));
+        }
         hikariConfig.setJdbcUrl(dataString + ";DB_CLOSE_DELAY=-1;");
 
         var dataSource = new HikariDataSource(hikariConfig);
         var sql = readResourceFile("schema.sql");
-
         JavalinJte.init(createTemplateEngine());
 
         try (var connection = dataSource.getConnection();
@@ -52,7 +54,7 @@ public class App {
 
         app.post(NamedRoutes.urlsPath(), UrlsController::create);
         app.get(NamedRoutes.urlsPath(), UrlsController::index);
-        app.post(NamedRoutes.buildUrlPath(), UrlsController::build);
+//        app.post(NamedRoutes.buildUrlPath(), UrlsController::build);
         app.get(NamedRoutes.urlPath("{id}"), UrlsController::show);
         return app;
     }

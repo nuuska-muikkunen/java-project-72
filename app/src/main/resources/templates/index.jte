@@ -27,7 +27,7 @@ content = @`
                         <a href="${NamedRoutes.urlPath(url.getId())}">${url.getName()}</a>
                     </td>
                     <td>
-                        ${url.getCreatedAt().toString()}
+                        Empty column
                     </td>
                     <td>
                         Another empty column

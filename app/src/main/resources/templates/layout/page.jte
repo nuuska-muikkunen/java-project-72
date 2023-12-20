@@ -1,5 +1,6 @@
 @import gg.jte.Content
 @import hexlet.code.dto.BasePage
+@import hexlet.code.util.NamedRoutes
 
 @param Content content
 @param BasePage page = null
@@ -25,7 +26,7 @@
                     <a class="nav-link" href="/">Главная</a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link" href="/urls">Сайты</a>
+                    <a class="nav-link" href="${NamedRoutes.urlsPath()}">Сайты</a>
                 </li>
             </ul>
         </div>
