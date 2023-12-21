@@ -31,7 +31,7 @@ public class App {
         System.out.println("JDBC_DATABASE_URL= " + dataString);
         if (dataString == null) {
             // jdbc:h2:mem:hexlet_project
-            hikariConfig.setJdbcUrl(dataString + ";DB_CLOSE_DELAY=-1;");
+            hikariConfig.setJdbcUrl("jdbc:h2:mem:hexlet_project;DB_CLOSE_DELAY=-1;");
         } else {
             hikariConfig.setUsername("JDBS_DATABASE_USERNAME");
             hikariConfig.setPassword("JDBS_DATABASE_PASSWORD");
