@@ -33,8 +33,8 @@ public class App {
             // jdbc:h2:mem:hexlet_project
             hikariConfig.setJdbcUrl("jdbc:h2:mem:hexlet_project;DB_CLOSE_DELAY=-1;");
         } else {
-            hikariConfig.setUsername("JDBS_DATABASE_USERNAME");
-            hikariConfig.setPassword("JDBS_DATABASE_PASSWORD");
+            hikariConfig.setUsername(System.getenv("JDBS_DATABASE_USERNAME"));
+            hikariConfig.setPassword(System.getenv("JDBS_DATABASE_PASSWORD"));
             // jdbc:postgresql://dpg-clsmorlcm5oc73b8f840-a/hexlet_learning_javalin
             hikariConfig.setJdbcUrl(dataString + ";DB_CLOSE_DELAY=-1;"
             );
