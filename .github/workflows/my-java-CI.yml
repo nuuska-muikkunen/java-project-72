@@ -26,7 +26,7 @@ jobs:
           build-root-directory: app
 # test and its coverage
       - name: Test the code
-        uses: make test
+        run: make test
 # end of test
       - name: Publish code coverage
         if: ${{ github.event_name == 'push' }}
