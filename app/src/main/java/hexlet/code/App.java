@@ -17,7 +17,7 @@ import gg.jte.resolve.ResourceCodeResolver;
 
 public class App {
 
-    private static TemplateEngine createTemplateEngine() {
+    protected static TemplateEngine createTemplateEngine() {
         ClassLoader classLoader = App.class.getClassLoader();
         ResourceCodeResolver codeResolver = new ResourceCodeResolver("templates", classLoader);
         return TemplateEngine.create(codeResolver, ContentType.Html);
@@ -26,24 +26,31 @@ public class App {
     public static Javalin getApp() throws IOException, SQLException {
 
         var hikariConfig = new HikariConfig();
-        var dataString = System.getenv("JDBC_DATABASE_URL");
+//        hikariConfig.setJdbcUrl(getJdbcUrl());
+        String dataString = System.getenv("JDBC_DATABASE_URL");
+        System.out.println("JDBC_DATABASE_URL= " + dataString);
         if (dataString == null) {
-            dataString = "jdbc:h2:mem:project";
+            // jdbc:h2:mem:hexlet_project
+            hikariConfig.setJdbcUrl(dataString + ";DB_CLOSE_DELAY=-1;");
         } else {
-            hikariConfig.setUsername(System.getenv("JDBS_DATABASE_USERNAME"));
-            hikariConfig.setPassword(System.getenv("JDBS_DATABASE_PASSWORD"));
+            hikariConfig.setUsername("JDBS_DATABASE_USERNAME");
+            hikariConfig.setPassword("JDBS_DATABASE_PASSWORD");
+            // jdbc:postgresql://dpg-clsmorlcm5oc73b8f840-a/hexlet_learning_javalin
+            hikariConfig.setJdbcUrl(dataString + ";DB_CLOSE_DELAY=-1;"
+            );
         }
-        hikariConfig.setJdbcUrl(dataString + ";DB_CLOSE_DELAY=-1;");
-
         var dataSource = new HikariDataSource(hikariConfig);
         var sql = readResourceFile("schema.sql");
+
         JavalinJte.init(createTemplateEngine());
 
         try (var connection = dataSource.getConnection();
              var statement = connection.createStatement()) {
             statement.execute(sql);
         }
+
         BaseRepository.dataSource = dataSource;
+
         var app = Javalin.create(config -> {
             config.plugins.enableDevLogging();
         });

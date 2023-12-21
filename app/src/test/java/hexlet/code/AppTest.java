@@ -1,11 +1,14 @@
 package hexlet.code;
 
+//import static hexlet.code.App.createTemplateEngine;
 //import static hexlet.code.util.Data.readResourceFile;
 import static org.assertj.core.api.Assertions.assertThat;
 
 //import com.zaxxer.hikari.HikariConfig;
 //import com.zaxxer.hikari.HikariDataSource;
+import hexlet.code.model.Url;
 //import hexlet.code.repository.BaseRepository;
+import hexlet.code.repository.UrlsRepository;
 //import io.javalin.rendering.template.JavalinJte;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.AfterAll;
@@ -15,7 +18,10 @@ import kong.unirest.Unirest;
 import io.javalin.Javalin;
 
 import java.io.IOException;
+//import java.net.URL;
 import java.sql.SQLException;
+import java.sql.Timestamp;
+import java.time.LocalDateTime;
 
 public class AppTest {
     private static Javalin app;
@@ -28,24 +34,11 @@ public class AppTest {
         app.start(portNumber);
         int port = app.port();
         baseUrl = "http://localhost:" + port;
-//        var hikariConfig = new HikariConfig();
-//
-//        var dataString = System.getenv("JDBC_DATABASE_URL") == null
-//                ? "jdbc:h2:mem:project" : System.getenv("JDBC_DATABASE_URL");
-//
-//        hikariConfig.setJdbcUrl(dataString + ";DB_CLOSE_DELAY=-1;");
-//
-//        var dataSource = new HikariDataSource(hikariConfig);
-//        var sql = readResourceFile("schema.sql");
-//
-//        try (var connection = dataSource.getConnection();
-//             var statement = connection.createStatement()) {
-//            statement.execute(sql);
-//        }
-//        BaseRepository.dataSource = dataSource;
-//        var app = Javalin.create(config -> {
-//            config.plugins.enableDevLogging();
-//        });
+
+        var url = new Url("http://www.rbc.ru", Timestamp.valueOf(LocalDateTime.now()));
+        UrlsRepository.save(url);
+        url = new Url("http://www.rbc.ru:8080", Timestamp.valueOf(LocalDateTime.now()));
+        UrlsRepository.save(url);
     }
 
     @AfterAll
@@ -78,19 +71,31 @@ public class AppTest {
         String expected = "Сайты";
         assertThat(response.getStatus()).isEqualTo(200);
         assertThat(actual).contains(expected);
+        assertThat(actual).contains("http://www.rbc.ru");
+        assertThat(actual).doesNotContain("http://www.mail.ru");
     }
 
-//    @Test
-//    void testListArticles1() throws Exception {
-//        HttpResponse<String> response = Unirest.get(baseUrl + "/urls").asString();
-//        String body = response.getBody();
-//
-//        assertThat(response.getStatus()).isEqualTo(200);
-//        assertThat(body).contains("http://www.rbc.ru");
-//        assertThat(body).contains("http://www.rbc.ru:7070");
-//        assertThat(body).contains("Последняя проверка");
-//        assertThat(body).doesNotContain("\thttp://www.ethtrgh");
-//        assertThat(body).contains("?page=2");
-//    }
+    @Test
+    void testRegisterNewUser1() throws Exception {
+        HttpResponse responsePost = Unirest
+                .post(baseUrl + "/urls")
+                .field("url", "http://www.vk.ru")
+                .asEmpty();
+
+        assertThat(responsePost.getStatus()).isEqualTo(302);
+        assertThat(responsePost.getHeaders().getFirst("Location")).isEqualTo("/urls");
+
+        HttpResponse<String> response = Unirest
+                .get(baseUrl + "/urls")
+                .asString();
+        String body = response.getBody();
+        assertThat(body).contains("http://www.rbc.ru");
+        assertThat(body).contains("http://www.vk.ru");
+
+        var urlrbc = UrlsRepository.search("http://www.rbc.ru").get();
+        var urlvk = UrlsRepository.search("http://www.vk.ru").get();
+        assertThat(urlrbc.getName()).isEqualTo("http://www.rbc.ru");
+        assertThat(urlvk.getName()).isEqualTo("http://www.vk.ru");
+    }
 
 }
