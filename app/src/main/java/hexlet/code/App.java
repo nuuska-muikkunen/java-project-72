@@ -1,5 +1,6 @@
 package hexlet.code;
 
+import hexlet.code.controller.UrlChecksController;
 import hexlet.code.controller.UrlsController;
 import io.javalin.Javalin;
 import java.io.IOException;
@@ -26,19 +27,17 @@ public class App {
     public static Javalin getApp() throws IOException, SQLException {
 
         var hikariConfig = new HikariConfig();
-//        hikariConfig.setJdbcUrl(getJdbcUrl());
+// ?       hikariConfig.setJdbcUrl(getJdbcUrl());
         String dataString = System.getenv("JDBC_DATABASE_URL");
-        System.out.println("JDBC_DATABASE_URL= " + dataString);
         if (dataString == null) {
-            // jdbc:h2:mem:hexlet_project
-            hikariConfig.setJdbcUrl("jdbc:h2:mem:hexlet_project;DB_CLOSE_DELAY=-1;");
+            hikariConfig.setJdbcUrl("jdbc:h2:mem:hexlet_project;DB_CLOSE_DELAY=-1;"); // jdbc:h2:mem:hexlet_project
         } else {
             hikariConfig.setUsername(System.getenv("JDBS_DATABASE_USERNAME"));
             hikariConfig.setPassword(System.getenv("JDBS_DATABASE_PASSWORD"));
             // jdbc:postgresql://dpg-clsmorlcm5oc73b8f840-a/hexlet_learning_javalin
-            hikariConfig.setJdbcUrl(dataString + ";DB_CLOSE_DELAY=-1;"
-            );
+            hikariConfig.setJdbcUrl(dataString + ";DB_CLOSE_DELAY=-1;");
         }
+        System.out.println("JDBC_DATABASE_URL= " + dataString);
         var dataSource = new HikariDataSource(hikariConfig);
         var sql = readResourceFile("schema.sql");
 
@@ -55,14 +54,11 @@ public class App {
             config.plugins.enableDevLogging();
         });
 
-        app.get("/", ctx -> {
-            ctx.render("mainPage.jte");
-        });
-
-        app.post(NamedRoutes.urlsPath(), UrlsController::create);
+        app.get(NamedRoutes.rootPath(), UrlsController::root);
         app.get(NamedRoutes.urlsPath(), UrlsController::index);
-//        app.post(NamedRoutes.buildUrlPath(), UrlsController::build);
+        app.post(NamedRoutes.urlsPath(), UrlsController::create);
         app.get(NamedRoutes.urlPath("{id}"), UrlsController::show);
+        app.post(NamedRoutes.checkPath("{id}"), UrlChecksController::createCheck);
         return app;
     }
     public static void main(String[] args) throws SQLException, IOException {

@@ -12,14 +12,14 @@ content = @`
                     <div class="col-md-10 col-lg-8 mx-auto text-white">
                         <h1 class="display-3 mb-0">Анализатор страниц</h1>
                         <p class="lead">Бесплатно проверяйте сайты на SEO пригодность</p>
-                        <form action="${NamedRoutes.urlsPath()}" method="post" class="rss-form text-body">
+                        <form method="post" action="${NamedRoutes.urlsPath()}" class="rss-form text-body">
                             <div class="row">
                                 <div class="col">
                                     <div class="form-floating">
                                         <input id="url-input"
-                                               autofocus=""
+                                               autofocus
                                                type="text"
-                                               required=""
+                                               required
                                                name="url"
                                                aria-label="url"
                                                class="form-control w-100"
@@ -33,7 +33,7 @@ content = @`
                                 </div>
                             </div>
                         </form>
-                        <p class="lead mt-2 mb-0 text-muted">Пример: https://www.example.com</p>
+                        <p class="lead mt-2 mb-0 text-secondary">Пример: https://www.example.com</p>
                     </div>
                 </div>
             </div>

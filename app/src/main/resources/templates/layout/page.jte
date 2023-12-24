@@ -33,6 +33,12 @@
     </div>
 </nav>
 
+@if(page != null && page.getCheck() != null)
+    <div class="alert alert-${page.getCheckType()}" role="alert">
+        ${page.getCheck()}
+    </div>
+@endif
+
 @if(page != null && page.getFlash() != null)
     <div class="alert alert-${page.getFlashType()}" role="alert">
         ${page.getFlash()}

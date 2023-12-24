@@ -1,15 +1,9 @@
 package hexlet.code;
 
-//import static hexlet.code.App.createTemplateEngine;
-//import static hexlet.code.util.Data.readResourceFile;
 import static org.assertj.core.api.Assertions.assertThat;
 
-//import com.zaxxer.hikari.HikariConfig;
-//import com.zaxxer.hikari.HikariDataSource;
 import hexlet.code.model.Url;
-//import hexlet.code.repository.BaseRepository;
 import hexlet.code.repository.UrlsRepository;
-//import io.javalin.rendering.template.JavalinJte;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.Test;
@@ -18,7 +12,6 @@ import kong.unirest.Unirest;
 import io.javalin.Javalin;
 
 import java.io.IOException;
-//import java.net.URL;
 import java.sql.SQLException;
 import java.sql.Timestamp;
 import java.time.LocalDateTime;
@@ -76,8 +69,8 @@ public class AppTest {
     }
 
     @Test
-    void testRegisterNewUser1() throws Exception {
-        HttpResponse responsePost = Unirest
+    void testRegisterNewSite1() throws Exception {
+        var responsePost = Unirest
                 .post(baseUrl + "/urls")
                 .field("url", "http://www.vk.ru")
                 .asEmpty();
@@ -96,6 +89,39 @@ public class AppTest {
         var urlvk = UrlsRepository.search("http://www.vk.ru").get();
         assertThat(urlrbc.getName()).isEqualTo("http://www.rbc.ru");
         assertThat(urlvk.getName()).isEqualTo("http://www.vk.ru");
+    }
+
+    @Test
+    void testShowUrl() throws Exception {
+        var responseGet = Unirest
+                .get(baseUrl + "/urls/1")
+                .asEmpty();
+
+        assertThat(responseGet.getStatus()).isEqualTo(200);
+
+        HttpResponse<String> response = Unirest
+                .get(baseUrl + "/urls/1")
+                .asString();
+        String body = response.getBody();
+        assertThat(body).contains("http://www.rbc.ru");
+        assertThat(body).contains("Запустить проверку");
+    }
+
+    @Test
+    void testCheckUrl() throws Exception {
+        var responsePost = Unirest
+                .post(baseUrl + "/urls/1/checks")
+                .asEmpty();
+
+        assertThat(responsePost.getStatus()).isEqualTo(302);
+
+        HttpResponse<String> response = Unirest
+                .get(baseUrl + "/urls/1")
+                .asString();
+        String body = response.getBody();
+        assertThat(body).contains("Сайт:");
+        assertThat(body).contains("на сайте rbc.ru");
+        assertThat(body).contains("Код ответа");
     }
 
 }
