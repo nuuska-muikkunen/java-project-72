@@ -37,8 +37,7 @@ public class App {
 //            hikariConfig.setPassword(System.getenv("JDBС_DATABASE_PASSWORD"));
             hikariConfig.setPassword("qqMNZWjSjPQ78K7AGiGquXwR9hi74GSU");
             // jdbc:postgresql://dpg-clsmorlcm5oc73b8f840-a/hexlet_learning_javalin
-            hikariConfig.setJdbcUrl("jdbc:postgresql://dpg-clsmorlcm5oc73b8f840-a/hexlet_learning_javalin;"
-                    + "DB_CLOSE_DELAY=-1;");
+            hikariConfig.setJdbcUrl("jdbc:postgresql://dpg-clsmorlcm5oc73b8f840-a/hexlet_learning_javalin");
         }
         System.out.println("JDBC_DATABASE_URL= " + dataString);
         var dataSource = new HikariDataSource(hikariConfig);
