@@ -32,10 +32,10 @@ public class App {
         if (dataString == null || dataString.equals("jdbc:h2:mem:hexlet_project")) {
             hikariConfig.setJdbcUrl("jdbc:h2:mem:hexlet_project;DB_CLOSE_DELAY=-1;"); // jdbc:h2:mem:hexlet_project
         } else {
-//            hikariConfig.setUsername(System.getenv("JDBS_DATABASE_USERNAME"));
-            hikariConfig.setUsername(System.getenv("hexlet_learning_javalin_user"));
-//            hikariConfig.setPassword(System.getenv("JDBS_DATABASE_PASSWORD"));
-            hikariConfig.setPassword(System.getenv("qqMNZWjSjPQ78K7AGiGquXwR9hi74GSU"));
+//            hikariConfig.setUsername(System.getenv("JDBС_DATABASE_USERNAME"));
+            hikariConfig.setUsername("hexlet_learning_javalin_user");
+//            hikariConfig.setPassword(System.getenv("JDBС_DATABASE_PASSWORD"));
+            hikariConfig.setPassword("qqMNZWjSjPQ78K7AGiGquXwR9hi74GSU");
             // jdbc:postgresql://dpg-clsmorlcm5oc73b8f840-a/hexlet_learning_javalin
             hikariConfig.setJdbcUrl("jdbc:postgresql://dpg-clsmorlcm5oc73b8f840-a/hexlet_learning_javalin;"
                     + "DB_CLOSE_DELAY=-1;");
