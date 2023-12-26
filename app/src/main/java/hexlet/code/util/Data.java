@@ -7,6 +7,7 @@ import java.nio.charset.StandardCharsets;
 import java.sql.SQLException;
 import java.sql.Timestamp;
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -41,9 +42,9 @@ public class Data {
         try {
             if (UrlChecksRepository.getChecks(url.getId()).isPresent()
                     && UrlChecksRepository.getChecks(url.getId()).get().size() >= 1) {
-                return UrlChecksRepository.getChecks(url.getId())
+                return toDateString(UrlChecksRepository.getChecks(url.getId())
                         .get().get(UrlChecksRepository.getChecks(url.getId()).get().size() - 1)
-                        .getCreatedAt().toString();
+                        .getCreatedAt());
             } else {
                 return "";
             }
@@ -75,6 +76,13 @@ public class Data {
             return new Url("http://example@example.example",
                     Timestamp.valueOf(LocalDateTime.now()));
         }
+    }
+
+    public static String toDateString(Timestamp dateTimeStamp) {
+        var date = dateTimeStamp.toLocalDateTime();
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm");
+        String text = date.format(formatter);
+        return text;
     }
 
 }

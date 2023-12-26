@@ -2,6 +2,7 @@
 @import hexlet.code.util.NamedRoutes
 @import static hexlet.code.util.Data.getChecksList
 @import static hexlet.code.controller.UrlChecksController.hasChecks
+@import static hexlet.code.util.Data.toDateString
 
 @param UrlPage page
 
@@ -32,7 +33,7 @@ content = @`
                         Дата создания
                     </td>
                     <td>
-                        ${page.getUrl().getCreatedAt().toString()}
+                        ${toDateString(page.getUrl().getCreatedAt())}
                     </td>
                 </tr>
             </tbody>
@@ -72,7 +73,7 @@ content = @`
                         ${check.getDescription()}
                     </td>
                     <td>
-                        ${check.getCreatedAt().toString()}
+                        ${toDateString(check.getCreatedAt())}
                     </td>
                 </tr>
             @endfor

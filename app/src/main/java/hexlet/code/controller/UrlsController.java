@@ -35,6 +35,7 @@ public class UrlsController {
         var page = new UrlPage(url);
         page.setCheckType(ctx.consumeSessionAttribute("checkType"));
         page.setCheck(ctx.consumeSessionAttribute("check"));
+        System.out.println("check = " + page.getCheck() + "\ncheckType= " + page.getCheckType());
         ctx.render("urls/show.jte", Collections.singletonMap("page", page));
     }
 

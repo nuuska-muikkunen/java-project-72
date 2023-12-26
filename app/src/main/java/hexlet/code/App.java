@@ -27,19 +27,18 @@ public class App {
     public static Javalin getApp() throws IOException, SQLException {
 
         var hikariConfig = new HikariConfig();
-// ?       hikariConfig.setJdbcUrl(getJdbcUrl());
         String dataString = System.getenv("JDBC_DATABASE_URL");
-        if (dataString == null || dataString.equals("jdbc:h2:mem:hexlet_project")) {
-            hikariConfig.setJdbcUrl("jdbc:h2:mem:hexlet_project;DB_CLOSE_DELAY=-1;"); // jdbc:h2:mem:hexlet_project
-        } else {
-//            hikariConfig.setUsername(System.getenv("JDBС_DATABASE_USERNAME"));
-            hikariConfig.setUsername("hexlet_learning_javalin_user");
-//            hikariConfig.setPassword(System.getenv("JDBС_DATABASE_PASSWORD"));
-            hikariConfig.setPassword("qqMNZWjSjPQ78K7AGiGquXwR9hi74GSU");
-            // jdbc:postgresql://dpg-clsmorlcm5oc73b8f840-a/hexlet_learning_javalin
-            hikariConfig.setJdbcUrl("jdbc:postgresql://dpg-clsmorlcm5oc73b8f840-a/hexlet_learning_javalin");
-        }
         System.out.println("JDBC_DATABASE_URL= " + dataString);
+        if (dataString == null || dataString.equals("jdbc:h2:mem:hexlet_project")) {
+            // jdbc:h2:mem:hexlet_project
+            hikariConfig.setJdbcUrl("jdbc:h2:mem:hexlet_project;DB_CLOSE_DELAY=-1;");
+        } else {
+            hikariConfig.setUsername(System.getenv("JDBС_DATABASE_USERNAME"));
+            hikariConfig.setPassword(System.getenv("JDBС_DATABASE_PASSWORD"));
+            // jdbc:postgresql://dpg-clsmorlcm5oc73b8f840-a/hexlet_learning_javalin
+            // jdbc:postgresql://localhost:5432/hexlet user=postgres password=xxxxxxx sslmode=prefer connect_timeout=10
+            hikariConfig.setJdbcUrl(dataString);
+        }
         var dataSource = new HikariDataSource(hikariConfig);
         var sql = readResourceFile("schema.sql");
 

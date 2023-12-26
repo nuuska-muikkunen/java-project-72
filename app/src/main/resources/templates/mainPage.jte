@@ -1,7 +1,7 @@
-@import hexlet.code.dto.urls.UrlsPage
+@import hexlet.code.dto.BasePage
 @import hexlet.code.util.NamedRoutes
 
-@param UrlsPage page
+@param BasePage page
 
 @template.layout.page(
 page = page,

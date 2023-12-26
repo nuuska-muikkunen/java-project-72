@@ -1,5 +1,6 @@
 package hexlet.code.controller;
 
+import hexlet.code.dto.urls.UrlCheckPage;
 import hexlet.code.model.UrlCheck;
 import hexlet.code.repository.UrlChecksRepository;
 import hexlet.code.util.NamedRoutes;
@@ -28,8 +29,10 @@ public class UrlChecksController {
         var createdAt = Timestamp.valueOf(LocalDateTime.now());
         var check = new UrlCheck(urlId, statusCode, title, h1, description, createdAt);
         UrlChecksRepository.saveCheck(check);
+        var page = new UrlCheckPage(check);
         ctx.sessionAttribute("checkType", "success");
         ctx.sessionAttribute("check", "Страница успешно проверена");
+        System.out.println("check = " + page.getCheck() + "\ncheckType= " + page.getCheckType());
         ctx.redirect(NamedRoutes.urlPath(urlId));
     }
 
