@@ -27,7 +27,7 @@ public class App {
     public static Javalin getApp() throws IOException, SQLException {
 
         var hikariConfig = new HikariConfig();
-        String dataString = System.getenv("JDBC_DATABASE_URL");
+        var dataString = System.getenv("JDBC_DATABASE_URL");
         System.out.println("JDBC_DATABASE_URL= " + dataString);
         if (dataString == null || dataString.equals("jdbc:h2:mem:hexlet_project")) {
             // jdbc:h2:mem:hexlet_project

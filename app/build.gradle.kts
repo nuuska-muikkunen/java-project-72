@@ -39,6 +39,7 @@ dependencies {
     testImplementation("org.junit.jupiter:junit-jupiter:5.10.0")
     implementation("org.postgresql:postgresql:42.7.1")
     testImplementation("com.squareup.okhttp3:mockwebserver:4.12.0")
+    implementation ("org.jsoup:jsoup:1.17.1")
 }
 
 tasks.jacocoTestReport {
