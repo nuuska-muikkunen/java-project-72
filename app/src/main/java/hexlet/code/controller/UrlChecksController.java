@@ -26,9 +26,8 @@ public class UrlChecksController {
                 ? "" : doc.getElementsByTag("title").html();
         var h1 = doc.getElementsByTag("h1").isEmpty()
                 ? "" : doc.getElementsByTag("h1").html();
-        var description = doc.getElementsByTag("meta").isEmpty()
-                        ? ""
-                : doc.getElementsByAttributeValue("name", "description").get(0).attributes().get("content");
+        var metaTags = doc.getElementsByAttributeValue("name", "description");
+        var description = metaTags.isEmpty() ? "" : metaTags.get(0).attr("content");
         var createdAt = Timestamp.valueOf(LocalDateTime.now());
         var check = new UrlCheck(urlId, statusCode, title, h1, description, createdAt);
         UrlChecksRepository.saveCheck(check);

@@ -34,7 +34,8 @@ public class App {
             hikariConfig.setJdbcUrl("jdbc:h2:mem:hexlet_project;DB_CLOSE_DELAY=-1;");
         } else {
             hikariConfig.setUsername(System.getenv("JDBС_DATABASE_USERNAME"));
-            hikariConfig.setPassword(System.getenv("JDBС_DATABASE_PASSWORD"));
+            hikariConfig.setPassword(System.getenv("JDBC_DATABASE_PASSWORD"));
+//            hikariConfig.setPassword("Monday.55");
             // jdbc:postgresql://dpg-clsmorlcm5oc73b8f840-a/hexlet_learning_javalin
             // jdbc:postgresql://localhost:5432/hexlet user=postgres password=xxxxxxx sslmode=prefer connect_timeout=10
             hikariConfig.setJdbcUrl(dataString);
