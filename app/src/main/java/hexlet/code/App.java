@@ -28,12 +28,17 @@ public class App {
 
         var hikariConfig = new HikariConfig();
         var dataString = System.getenv("JDBC_DATABASE_URL");
-        System.out.println("JDBC_DATABASE_URL= " + dataString);
+        System.out.println("JDBC_DATABASE_URL=" + dataString);
         if (dataString == null || dataString.equals("jdbc:h2:mem:hexlet_project")) {
             hikariConfig.setJdbcUrl("jdbc:h2:mem:hexlet_project;DB_CLOSE_DELAY=-1;");
         } else {
-            hikariConfig.setUsername(System.getenv("JDBС_DATABASE_USERNAME"));
-            hikariConfig.setPassword(System.getenv("JDBC_DATABASE_PASSWORD"));
+            var userName = System.getenv("JDBC_DATABASE_USERNAME");
+            System.out.println("JDBС_DATABASE_USERNAME=" + userName);
+//            userName = "newcomer";
+            hikariConfig.setUsername(userName);
+            var pass = System.getenv("JDBC_DATABASE_PASSWORD");
+            System.out.println("JDBC_DATABASE_PASSWORD=" + pass);
+            hikariConfig.setPassword(pass);
             hikariConfig.setJdbcUrl(dataString);
         }
         var dataSource = new HikariDataSource(hikariConfig);
