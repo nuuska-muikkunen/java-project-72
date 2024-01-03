@@ -9,18 +9,18 @@ import hexlet.code.model.Url;
 import hexlet.code.repository.UrlsRepository;
 import hexlet.code.util.NamedRoutes;
 
-import java.net.MalformedURLException;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.sql.SQLException;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.sql.Timestamp;
-import java.net.URL;
 
 import static hexlet.code.repository.UrlChecksRepository.getChecks;
 
 public class UrlsController {
-    public static void root(Context ctx) throws SQLException {
+    public static void root(Context ctx) {
         ctx.render("mainPage.jte");
     }
 
@@ -39,17 +39,16 @@ public class UrlsController {
         var url = UrlsRepository.find(id)
                 .orElseThrow(() -> new NotFoundResponse("Url with id = " + id + " not found"));
         var urlChecks = getChecks(id).isPresent() ? getChecks(id).get() : new ArrayList<UrlCheck>();
-        var page = new UrlPage(urlChecks, url);
+        var page = new UrlPage(url, urlChecks);
         ctx.render("urls/show.jte", Collections.singletonMap("page", page));
     }
 
-    public static void create(Context ctx) throws SQLException, MalformedURLException {
+    public static void create(Context ctx) throws SQLException, RuntimeException {
         var createdAt = Timestamp.valueOf(LocalDateTime.now());
         String str = ctx.formParam("url").trim();
         try {
-            var name = new URL(str);
-            String port = name.getPort() == -1 ? "" : ":" + name.getPort();
-            String addressString = name.getProtocol() + "://" + name.getHost() + port;
+            var name = new URI(str);
+            String addressString = name.getScheme() + "://" + name.getAuthority();
             var url = new Url(addressString, createdAt);
             if (UrlsRepository.isInDatabase(addressString)) {
                 ctx.sessionAttribute("flashType", "danger");
@@ -59,9 +58,10 @@ public class UrlsController {
                 ctx.sessionAttribute("flashType", "success");
                 ctx.sessionAttribute("flash", "Страница успешно добавлена");
             }
-        } catch (MalformedURLException e) {
+        } catch (URISyntaxException e) {
             ctx.sessionAttribute("flashType", "danger");
             ctx.sessionAttribute("flash", "Некорректный URL");
+            throw new RuntimeException(e);
         }
         ctx.redirect(NamedRoutes.urlsPath());
     }

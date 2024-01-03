@@ -1,7 +1,7 @@
 @import hexlet.code.dto.urls.UrlsPage
 @import hexlet.code.util.NamedRoutes
-@import static hexlet.code.util.Data.getLatestCheckTime
-@import static hexlet.code.util.Data.getLatestCheckStatus
+@import static hexlet.code.controller.UrlChecksController.getLatestCheckStatus
+@import static hexlet.code.controller.UrlChecksController.getLatestCheckTime
 
 @param UrlsPage page
 
@@ -30,10 +30,10 @@ content = @`
                             <a href="${NamedRoutes.urlPath(url.getId())}">${url.getName()}</a>
                         </td>
                         <td>
-                            ${getLatestCheckTime(url)}
+                            ${getLatestCheckTime(url.getId())}
                         </td>
                         <td>
-                            ${getLatestCheckStatus(url)}
+                            ${getLatestCheckStatus(url.getId())}
                         </td>
                     </tr>
                 @endfor

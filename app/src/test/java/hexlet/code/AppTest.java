@@ -23,8 +23,7 @@ public class AppTest {
     @BeforeAll
     public static void beforeAll() throws IOException, SQLException {
         app = App.getApp();
-        var portNumber = System.getenv("PORT") == null ? 7070 : Integer.parseInt(System.getenv("PORT"));
-        app.start(portNumber);
+        app.start(7070);
         int port = app.port();
         baseUrl = "http://localhost:" + port;
 

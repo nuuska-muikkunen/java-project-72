@@ -1,25 +1,33 @@
 package hexlet.code.controller;
 
-import hexlet.code.dto.urls.UrlCheckPage;
 import hexlet.code.model.UrlCheck;
-import hexlet.code.repository.UrlChecksRepository;
 import hexlet.code.util.NamedRoutes;
 import io.javalin.http.Context;
 import hexlet.code.repository.UrlsRepository;
 import org.jsoup.Jsoup;
 
-import java.net.UnknownHostException;
 import java.sql.SQLException;
 import java.time.LocalDateTime;
 import java.sql.Timestamp;
+import java.util.Comparator;
 
 import kong.unirest.Unirest;
 import org.jsoup.nodes.Document;
 
+import static hexlet.code.repository.UrlChecksRepository.saveCheck;
+import static hexlet.code.repository.UrlChecksRepository.getChecks;
+import static hexlet.code.util.Data.toDateString;
+
 public class UrlChecksController {
-    public static void createCheck(Context ctx) throws SQLException, UnknownHostException {
+    public static void createCheck(Context ctx) throws SQLException {
         var urlId = ctx.pathParamAsClass("id", Long.class).get();
-        var response = Unirest.get(UrlsRepository.find(urlId).orElseThrow().getName()).asString();
+        String name;
+        if (UrlsRepository.find(urlId).isPresent()) {
+            name = UrlsRepository.find(urlId).get().getName();
+        } else {
+            throw (new SQLException("No such mane in DB"));
+        }
+        var response = Unirest.get(name).asString();
         var body = response.getBody();
         var statusCode = response.getStatus();
         Document doc = Jsoup.parse(body);
@@ -31,11 +39,41 @@ public class UrlChecksController {
         var description = metaTags.isEmpty() ? "" : metaTags.get(0).attr("content");
         var createdAt = Timestamp.valueOf(LocalDateTime.now());
         var check = new UrlCheck(urlId, statusCode, title, h1, description, createdAt);
-        UrlChecksRepository.saveCheck(check);
-        var page = new UrlCheckPage(check);
+        saveCheck(check);
         ctx.sessionAttribute("checkType", "success");
         ctx.sessionAttribute("check", "Страница успешно проверена");
         ctx.redirect(NamedRoutes.urlsPath());
+    }
+
+    public static String getLatestCheckTime(Long urlId) {
+        try {
+            if (getChecks(urlId).isPresent() && !getChecks(urlId).get().isEmpty()) {
+                return toDateString(getChecks(urlId).get().stream()
+                        .max(Comparator.comparing(UrlCheck::getCreatedAt))
+                        .get()
+                        .getCreatedAt());
+            } else {
+                return "";
+            }
+        } catch (SQLException e) {
+            return "";
+        }
+    }
+
+    public static String getLatestCheckStatus(Long urlId) {
+        try {
+            if (getChecks(urlId).isPresent() && !getChecks(urlId).get().isEmpty()) {
+                return getChecks(urlId).get().stream()
+                        .max(Comparator.comparing(UrlCheck::getCreatedAt))
+                        .get()
+                        .getStatusCode()
+                        .toString();
+            } else {
+                return "";
+            }
+        } catch (SQLException e) {
+            return "";
+        }
     }
 
 }

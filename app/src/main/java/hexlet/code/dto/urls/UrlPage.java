@@ -12,6 +12,6 @@ import java.util.ArrayList;
 @AllArgsConstructor
 @Getter
 public class UrlPage extends BasePage {
-    private ArrayList<UrlCheck> urlChecks;
     private Url url;
+    private ArrayList<UrlCheck> urlChecks;
 }
