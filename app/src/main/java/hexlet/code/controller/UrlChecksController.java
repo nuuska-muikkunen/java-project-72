@@ -8,6 +8,7 @@ import io.javalin.http.Context;
 import hexlet.code.repository.UrlsRepository;
 import org.jsoup.Jsoup;
 
+import java.net.UnknownHostException;
 import java.sql.SQLException;
 import java.time.LocalDateTime;
 import java.sql.Timestamp;
@@ -16,7 +17,7 @@ import kong.unirest.Unirest;
 import org.jsoup.nodes.Document;
 
 public class UrlChecksController {
-    public static void createCheck(Context ctx) throws SQLException {
+    public static void createCheck(Context ctx) throws SQLException, UnknownHostException {
         var urlId = ctx.pathParamAsClass("id", Long.class).get();
         var response = Unirest.get(UrlsRepository.find(urlId).orElseThrow().getName()).asString();
         var body = response.getBody();
@@ -34,16 +35,7 @@ public class UrlChecksController {
         var page = new UrlCheckPage(check);
         ctx.sessionAttribute("checkType", "success");
         ctx.sessionAttribute("check", "Страница успешно проверена");
-        System.out.println("check = " + page.getCheck() + "\ncheckType= " + page.getCheckType());
-        ctx.redirect(NamedRoutes.urlPath(urlId));
-    }
-
-    public static boolean hasChecks(Long urlId) {
-        try {
-            return UrlChecksRepository.getChecks(urlId).isPresent();
-        } catch (SQLException e) {
-            return false;
-        }
+        ctx.redirect(NamedRoutes.urlsPath());
     }
 
 }

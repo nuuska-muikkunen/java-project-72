@@ -10,7 +10,7 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Bootstrap demo</title>
+    <title>Анализатор страниц</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css"
           rel="stylesheet"
           integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN"
@@ -33,20 +33,22 @@
     </div>
 </nav>
 
-@if(page != null && page.getCheck() != null)
-    <div class="alert alert-${page.getCheckType()}" role="alert">
-        ${page.getCheck()}
-    </div>
-@endif
-
-@if(page != null && page.getFlash() != null)
-    <div class="alert alert-${page.getFlashType()}" role="alert">
-        ${page.getFlash()}
-    </div>
-@endif
-
 <main class="flex-grow-1">
+
+    @if(page != null && page.getCheck() != null)
+        <div class="alert alert-${page.getCheckType()}" role="alert">
+            <p class="m-0">${page.getCheck()}</p>
+        </div>
+    @endif
+
+    @if(page != null && page.getFlash() != null)
+        <div class="alert alert-${page.getFlashType()}" role="alert">
+                <p class="m-0">${page.getFlash()}</p>
+        </div>
+    @endif
+
     ${content}
+
 </main>
 
 <footer class="footer border-top py-3 mt-5 bg-light">

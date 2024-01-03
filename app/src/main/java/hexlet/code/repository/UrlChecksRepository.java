@@ -3,7 +3,6 @@ package hexlet.code.repository;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
-import java.util.List;
 import java.util.Optional;
 
 import hexlet.code.model.UrlCheck;
@@ -29,7 +28,7 @@ public class UrlChecksRepository extends BaseRepository {
             }
         }
     }
-    public static Optional<List<UrlCheck>> getChecks(Long urlId) throws SQLException {
+    public static Optional<ArrayList<UrlCheck>> getChecks(Long urlId) throws SQLException {
         var sql = "SELECT * FROM url_checks WHERE url_id = ?";
         try (var conn = dataSource.getConnection();
              var stmt = conn.prepareStatement(sql)) {

@@ -6,20 +6,12 @@ import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
 import java.sql.SQLException;
 import java.sql.Timestamp;
-import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.stream.Collectors;
-
-import hexlet.code.dto.urls.UrlChecksPage;
-import hexlet.code.dto.urls.UrlPage;
 
 import hexlet.code.App;
 import hexlet.code.model.Url;
 import hexlet.code.repository.UrlChecksRepository;
-import hexlet.code.model.UrlCheck;
-import hexlet.code.repository.UrlsRepository;
 
 public class Data {
 
@@ -30,18 +22,10 @@ public class Data {
         }
     }
 
-    public static List<UrlCheck> getChecksList(UrlPage page) {
-        try {
-            return UrlChecksRepository.getChecks(page.getUrl().getId()).get();
-        } catch (SQLException e) {
-            return new ArrayList<>();
-        }
-    }
-
     public static String getLatestCheckTime(Url url) {
         try {
             if (UrlChecksRepository.getChecks(url.getId()).isPresent()
-                    && UrlChecksRepository.getChecks(url.getId()).get().size() >= 1) {
+                    && !UrlChecksRepository.getChecks(url.getId()).get().isEmpty()) {
                 return toDateString(UrlChecksRepository.getChecks(url.getId())
                         .get().get(UrlChecksRepository.getChecks(url.getId()).get().size() - 1)
                         .getCreatedAt());
@@ -56,7 +40,7 @@ public class Data {
     public static String getLatestCheckStatus(Url url) {
         try {
             if (UrlChecksRepository.getChecks(url.getId()).isPresent()
-                    && UrlChecksRepository.getChecks(url.getId()).get().size() >= 1) {
+                    && !UrlChecksRepository.getChecks(url.getId()).get().isEmpty()) {
                 return String.valueOf(UrlChecksRepository.getChecks(url.getId())
                         .get().get(UrlChecksRepository.getChecks(url.getId()).get().size() - 1)
                         .getStatusCode());
@@ -68,21 +52,10 @@ public class Data {
         }
     }
 
-    public static Url getUrlOfCheck(UrlChecksPage page) {
-        try {
-            return UrlsRepository.find(page.getUrlChecks().get(page.getUrlChecks().size() - 1).getUrlId())
-                    .get();
-        } catch (SQLException e) {
-            return new Url("http://example@example.example",
-                    Timestamp.valueOf(LocalDateTime.now()));
-        }
-    }
-
     public static String toDateString(Timestamp dateTimeStamp) {
         var date = dateTimeStamp.toLocalDateTime();
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm");
-        String text = date.format(formatter);
-        return text;
+        return date.format(formatter);
     }
 
 }

@@ -1,7 +1,5 @@
 @import hexlet.code.dto.urls.UrlPage
 @import hexlet.code.util.NamedRoutes
-@import static hexlet.code.util.Data.getChecksList
-@import static hexlet.code.controller.UrlChecksController.hasChecks
 @import static hexlet.code.util.Data.toDateString
 
 @param UrlPage page
@@ -54,8 +52,8 @@ content = @`
         </tr>
         </thead>
         <tbody>
-        @if (hasChecks(page.getUrl().getId()))
-            @for(var check : getChecksList(page))
+        @if (!page.getUrlChecks().isEmpty())
+            @for(var check : page.getUrlChecks())
                 <tr>
                     <td>
                         ${check.getId()}
