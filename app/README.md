@@ -1,6 +1,9 @@
 # Web Page Analyser
 
-[WEB PAGE ANALYSER - сайт, который анализирует указанные страницы на SEO пригодность.]:
+**WEB PAGE ANALYSER** - сайт, который анализирует указанные страницы на SEO пригодность. Для запуска приложения перейдите по ссылке ниже.
+
+### Application web site
+[WEB PAGE ANALYSER]:
 https://java-project-72-3hfo.onrender.com/
 [WEB PAGE ANALYSER]
 
@@ -14,8 +17,3 @@ https://java-project-72-3hfo.onrender.com/
 [![Maintainability](https://api.codeclimate.com/v1/badges/59a29d6f2a170df45a63/maintainability)](https://codeclimate.com/github/nuuska-muikkunen/java-project-72/maintainability)
 [![Test Coverage](https://api.codeclimate.com/v1/badges/59a29d6f2a170df45a63/test_coverage)](https://codeclimate.com/github/nuuska-muikkunen/java-project-72/test_coverage)
 
-### Application web site
-
-[WEB PAGE ANALYSER]:
-https://java-project-72-3hfo.onrender.com/
-[WEB PAGE ANALYSER]
