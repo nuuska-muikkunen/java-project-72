@@ -48,15 +48,20 @@ public class UrlsController {
         String str = ctx.formParam("url").trim();
         try {
             var name = new URI(str);
-            String addressString = name.getScheme() + "://" + name.getAuthority();
-            var url = new Url(addressString, createdAt);
-            if (UrlsRepository.isInDatabase(addressString)) {
+            if (name.getScheme() == null || name.getAuthority() == null) {
                 ctx.sessionAttribute("flashType", "danger");
-                ctx.sessionAttribute("flash", "Страница " + str + " уже существует");
+                ctx.sessionAttribute("flash", "Страница " + str + " некорректная");
             } else {
-                UrlsRepository.save(url);
-                ctx.sessionAttribute("flashType", "success");
-                ctx.sessionAttribute("flash", "Страница успешно добавлена");
+                String addressString = name.getScheme() + "://" + name.getAuthority();
+                var url = new Url(addressString, createdAt);
+                if (UrlsRepository.isInDatabase(addressString)) {
+                    ctx.sessionAttribute("flashType", "danger");
+                    ctx.sessionAttribute("flash", "Страница " + str + " уже существует");
+                } else {
+                    UrlsRepository.save(url);
+                    ctx.sessionAttribute("flashType", "success");
+                    ctx.sessionAttribute("flash", "Страница успешно добавлена");
+                }
             }
         } catch (URISyntaxException e) {
             ctx.sessionAttribute("flashType", "danger");
