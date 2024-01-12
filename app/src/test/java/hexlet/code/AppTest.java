@@ -1,149 +1,143 @@
 package hexlet.code;
 
-import static hexlet.code.util.Data.fixture;
-import static hexlet.code.util.Data.getContentOfHtmlFile;
-import static org.assertj.core.api.Assertions.assertThat;
-
 import hexlet.code.model.Url;
 import hexlet.code.repository.UrlsRepository;
 import hexlet.code.util.NamedRoutes;
+import io.javalin.Javalin;
 import io.javalin.testtools.JavalinTest;
 import okhttp3.mockwebserver.MockResponse;
 import okhttp3.mockwebserver.MockWebServer;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.AfterAll;
-import org.junit.jupiter.api.Test;
-import kong.unirest.HttpResponse;
-import kong.unirest.Unirest;
-import io.javalin.Javalin;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.AfterEach;
 
+import java.io.BufferedReader;
+import java.io.FileReader;
 import java.io.IOException;
 import java.sql.SQLException;
 import java.sql.Timestamp;
 import java.time.LocalDateTime;
-import java.util.zip.DataFormatException;
+import java.util.StringJoiner;
+
+import static org.assertj.core.api.Assertions.assertThat;
 
 public class AppTest {
     private static Javalin app;
-    private static String baseUrl;
     private static MockWebServer mockServer;
-    private static String urlName;
+    private static String baseUrl;
+    private static final String HTML_PATH = "src/test/resources/index.html";
+
+    public static String getContentOfHtmlFile() throws IOException {
+        BufferedReader reader = new BufferedReader(new FileReader(HTML_PATH));
+        String lineOfFile = reader.readLine();
+        var result = new StringJoiner("\n");
+
+        while (lineOfFile != null) {
+            result.add(lineOfFile);
+            lineOfFile = reader.readLine();
+        }
+        return result.toString();
+    }
 
     @BeforeAll
-    public static void beforeAll() throws IOException, SQLException, DataFormatException {
-        app = App.getApp();
-        app.start(7070);
-        int port = app.port();
-        System.out.println("port after app start in BeforeAll= " + port);
-        baseUrl = "http://localhost:" + port;
-        var url = new Url("http://www.rbc.ru", Timestamp.valueOf(LocalDateTime.now()));
-        UrlsRepository.save(url);
-
+    public static void beforeAll() throws IOException, SQLException {
         mockServer = new MockWebServer();
-        urlName = mockServer.url("/").toString();
-        var mockResponse = new MockResponse().setBody(getContentOfHtmlFile(fixture("http.json")));
+        baseUrl = mockServer.url("/").toString();
+        var mockResponse = new MockResponse().setBody(getContentOfHtmlFile());
         mockServer.enqueue(mockResponse);
-        if (!mockServer.getHostName().isEmpty()) {
-            System.out.println("mockServer Host= " + mockServer.getHostName());
-            System.out.println("mockServer Port= " + mockServer.getPort());
-        }
     }
+
+    @BeforeEach
+    public void beforeEach() throws SQLException, IOException {
+        app = App.getApp();
+    }
+
+    @AfterEach
+    public void afterEach() {
+        app.stop();
+    }
+
 
     @AfterAll
     public static void afterAll() throws IOException {
-        app.stop();
         mockServer.shutdown();
     }
 
     @Test
-    void testRoot() throws Exception {
+    void testRoot() {
         JavalinTest.test(app, (server, client) -> {
-            var response = client.get(NamedRoutes.rootPath());
+            var response = client.get(baseUrl);
             assertThat(response.code()).isEqualTo(200);
-            assertThat(response.body().string()).contains("Page analyzer");
+            assertThat(response.body().toString()).contains("Анализатор страниц");
         });
-//        HttpResponse<String> response = Unirest.get(baseUrl + "/").asString();
-//        String actual = response.getBody();
-//        String expected = "Пример";
-//        assertThat(response.getStatus()).isEqualTo(200);
-//        assertThat(actual).contains(expected);
     }
 
     @Test
     void testEnvironment() throws Exception {
-        System.out.println("app.port() in testEnvironment = " + app.port());
-        HttpResponse<String> response = Unirest.get(baseUrl + "/").asString();
-        String actual = String.valueOf(app.port());
-        String expected = "7070";
-        assertThat(response.getStatus()).isEqualTo(200);
-        assertThat(actual).isEqualTo(expected);
+        JavalinTest.test(app, (server, client) -> {
+            var response = client.get(NamedRoutes.rootPath());
+            assertThat(response.code()).isEqualTo(200);
+            assertThat(server.port()).isEqualTo(7070);
+        });
     }
 
     @Test
     void testIndex() throws Exception {
-        HttpResponse<String> response = Unirest.get(baseUrl + "/urls").asString();
-        String actual = response.getBody();
-        String expected = "Сайты";
-        assertThat(response.getStatus()).isEqualTo(200);
-        assertThat(actual).contains(expected);
-        assertThat(actual).contains("http://www.rbc.ru");
-        assertThat(actual).doesNotContain("http://www.mail.ru");
+        JavalinTest.test(app, (server, client) -> {
+            var url = new Url("http://www.rbc.ru", Timestamp.valueOf(LocalDateTime.now()));
+            UrlsRepository.save(url);
+            var response = client.get(NamedRoutes.urlsPath());
+            assertThat(response.code()).isEqualTo(200);
+            assertThat(response.body().toString()).contains("Сайты");
+            assertThat(response.body().toString()).contains("http://www.rbc.ru");
+            assertThat(response.body().toString()).doesNotContain("http://www.mail.ru");
+        });
     }
 
     @Test
     void testRegisterNewSite1() throws Exception {
-        var responsePost = Unirest
-                .post(baseUrl + "/urls")
-                .field("url", "http://www.vk.ru")
-                .asEmpty();
+        JavalinTest.test(app, (server, client) -> {
+            var responsePost = client.post(NamedRoutes.urlsPath(), "http://www.rbc.ru");
+            assertThat(responsePost.code()).isEqualTo(302);
+            assertThat(responsePost.header("Location")).isEqualTo("/urls");
 
-        assertThat(responsePost.getStatus()).isEqualTo(302);
-        assertThat(responsePost.getHeaders().getFirst("Location")).isEqualTo("/urls");
+            var responseGet = client.get(NamedRoutes.urlsPath());
+            var body = responseGet.body().toString();
+            assertThat(body).contains("http://www.rbc.ru");
 
-        HttpResponse<String> response = Unirest
-                .get(baseUrl + "/urls")
-                .asString();
-        String body = response.getBody();
-        assertThat(body).contains("http://www.rbc.ru");
-        assertThat(body).contains("http://www.vk.ru");
-
-        var urlrbc = UrlsRepository.search("http://www.rbc.ru").get();
-        var urlvk = UrlsRepository.search("http://www.vk.ru").get();
-        assertThat(urlrbc.getName()).isEqualTo("http://www.rbc.ru");
-        assertThat(urlvk.getName()).isEqualTo("http://www.vk.ru");
+            var urlrbc = UrlsRepository.search("http://www.rbc.ru").get();
+            assertThat(urlrbc.getName()).isEqualTo("http://www.rbc.ru");
+        });
     }
 
     @Test
     void testShowUrl() throws Exception {
-        var responseGet = Unirest
-                .get(baseUrl + "/urls/1")
-                .asEmpty();
-
-        assertThat(responseGet.getStatus()).isEqualTo(200);
-
-        HttpResponse<String> response = Unirest
-                .get(baseUrl + "/urls/1")
-                .asString();
-        String body = response.getBody();
-        assertThat(body).contains("http://www.rbc.ru");
-        assertThat(body).contains("Запустить проверку");
+        JavalinTest.test(app, (server, client) -> {
+            var responseGet = client.get(NamedRoutes.urlPath("1"));
+            assertThat(responseGet.code()).isEqualTo(302);
+            var body = responseGet.body().toString();
+            assertThat(body).contains("http://www.rbc.ru");
+            assertThat(body).contains("Запустить проверку");
+        });
     }
 
     @Test
     void testCheckUrl() throws Exception {
-        var responsePost = Unirest
-                .post(baseUrl + "/urls/1/checks")
-                .asEmpty();
+        JavalinTest.test(app, (server, client) -> {
+            var url = new Url("http://www.rbc.ru", Timestamp.valueOf(LocalDateTime.now()));
+            UrlsRepository.save(url);
+            var responsePost = client.post(NamedRoutes.checkPath("1"),
+                    "{http://www.rbc.ru}");
+            assertThat(responsePost.code()).isEqualTo(302);
 
-        assertThat(responsePost.getStatus()).isEqualTo(302);
-
-        HttpResponse<String> response = Unirest
-                .get(baseUrl + "/urls/1")
-                .asString();
-        String body = response.getBody();
-        assertThat(body).contains("Сайт:");
-        assertThat(body).contains("на сайте rbc.ru");
-        assertThat(body).contains("Код ответа");
+            var responseGet = client.get(NamedRoutes.checkPath("1"));
+            var body = responseGet.body().toString();
+            assertThat(body).contains("Сайт:");
+            assertThat(body).contains("на сайте rbc.ru");
+            assertThat(body).contains("Код ответа");
+        });
     }
 
 }
