@@ -11,7 +11,6 @@ import java.util.stream.Collectors;
 import hexlet.code.App;
 
 public class Data {
-
     public static String readResourceFile(String fileName) throws IOException {
         var inputStream = App.class.getClassLoader().getResourceAsStream(fileName);
         try (BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream, StandardCharsets.UTF_8))) {

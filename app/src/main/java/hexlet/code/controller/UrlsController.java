@@ -48,10 +48,9 @@ public class UrlsController {
         String str = ctx.formParam("url").trim();
         try {
             var name = new URI(str);
-            if (name.getScheme() == null || name.getAuthority() == null
-                    || name.getScheme().isEmpty() || name.getAuthority().isEmpty()) {
+            if (name.getScheme() == null || name.getAuthority() == null) {
                 ctx.sessionAttribute("flashType", "danger");
-                ctx.sessionAttribute("flash", "Некорректный URL");
+                ctx.sessionAttribute("flash", "Страница " + str + " некорректная");
             } else {
                 String addressString = name.getScheme() + "://" + name.getAuthority();
                 var url = new Url(addressString, createdAt);
@@ -67,6 +66,7 @@ public class UrlsController {
         } catch (URISyntaxException e) {
             ctx.sessionAttribute("flashType", "danger");
             ctx.sessionAttribute("flash", "Некорректный URL");
+            throw new RuntimeException(e);
         }
         ctx.redirect(NamedRoutes.urlsPath());
     }
