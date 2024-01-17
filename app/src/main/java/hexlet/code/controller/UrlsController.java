@@ -48,20 +48,25 @@ public class UrlsController {
         String str = ctx.formParam("url").trim();
         try {
             var name = new URI(str);
-            String addressString = name.getScheme() + "://" + name.getAuthority();
-            var url = new Url(addressString, createdAt);
-            if (UrlsRepository.isInDatabase(addressString)) {
+            if (name.getScheme() == null || name.getAuthority() == null
+                    || name.getScheme().isEmpty() || name.getAuthority().isEmpty()) {
                 ctx.sessionAttribute("flashType", "danger");
-                ctx.sessionAttribute("flash", "Страница " + str + " уже существует");
+                ctx.sessionAttribute("flash", "Некорректный URL");
             } else {
-                UrlsRepository.save(url);
-                ctx.sessionAttribute("flashType", "success");
-                ctx.sessionAttribute("flash", "Страница успешно добавлена");
+                String addressString = name.getScheme() + "://" + name.getAuthority();
+                var url = new Url(addressString, createdAt);
+                if (UrlsRepository.isInDatabase(addressString)) {
+                    ctx.sessionAttribute("flashType", "danger");
+                    ctx.sessionAttribute("flash", "Страница " + str + " уже существует");
+                } else {
+                    UrlsRepository.save(url);
+                    ctx.sessionAttribute("flashType", "success");
+                    ctx.sessionAttribute("flash", "Страница успешно добавлена");
+                }
             }
         } catch (URISyntaxException e) {
             ctx.sessionAttribute("flashType", "danger");
             ctx.sessionAttribute("flash", "Некорректный URL");
-            throw new RuntimeException(e);
         }
         ctx.redirect(NamedRoutes.urlsPath());
     }
