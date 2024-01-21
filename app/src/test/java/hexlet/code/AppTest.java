@@ -85,10 +85,9 @@ public class AppTest {
             client.post(NamedRoutes.urlsPath(), requestBody);
             assertThat(UrlsRepository.getEntities()).hasSize(1);
 
-            requestBody = "url=фывфыва";
+            requestBody = "url=фывфыа";
             var response = client.post(NamedRoutes.urlsPath(), requestBody);
             var bodyString = response.body().string();
-//            assertThat(bodyString).contains("Некорректный URL");
             assertThat(UrlsRepository.getEntities()).hasSize(1);
 
             requestBody = "url=http://";

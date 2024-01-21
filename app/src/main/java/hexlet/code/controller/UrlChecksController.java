@@ -19,7 +19,7 @@ import static hexlet.code.repository.UrlChecksRepository.getChecks;
 import static hexlet.code.util.Data.toDateString;
 
 public class UrlChecksController {
-    public static void createCheck(Context ctx) throws SQLException {
+    public static void createCheck(Context ctx) throws SQLException, RuntimeException {
         var urlId = ctx.pathParamAsClass("id", Long.class).get();
         String name;
         if (UrlsRepository.find(urlId).isPresent()) {
@@ -27,24 +27,29 @@ public class UrlChecksController {
         } else {
             throw (new SQLException("No such mane in DB"));
         }
-        var response = Unirest.get(name).asString();
-        var body = response.getBody();
-        var statusCode = response.getStatus();
-        Document doc = Jsoup.parse(body);
-        var title = doc.getElementsByTag("title").isEmpty()
-                ? "" : doc.getElementsByTag("title").html();
-        var h1 = doc.getElementsByTag("h1").isEmpty()
-                ? "" : doc.getElementsByTag("h1").html();
-        var metaTags = doc.getElementsByAttributeValue("name", "description");
-        var description = metaTags.isEmpty() ? "" : metaTags.get(0).attr("content");
-        var createdAt = Timestamp.valueOf(LocalDateTime.now());
-        var check = new UrlCheck(urlId, statusCode, title, h1, description, createdAt);
-        saveCheck(check);
-        ctx.sessionAttribute("checkType", "success");
-        ctx.sessionAttribute("check", "Страница успешно проверена");
-        ctx.redirect(NamedRoutes.urlsPath());
+        try {
+            var response = Unirest.get(name).asString();
+            var body = response.getBody();
+            var statusCode = response.getStatus();
+            Document doc = Jsoup.parse(body);
+            var title = doc.getElementsByTag("title").isEmpty()
+                    ? "" : doc.getElementsByTag("title").html();
+            var h1 = doc.getElementsByTag("h1").isEmpty()
+                    ? "" : doc.getElementsByTag("h1").html();
+            var metaTags = doc.getElementsByAttributeValue("name", "description");
+            var description = metaTags.isEmpty() ? "" : metaTags.get(0).attr("content");
+            var createdAt = Timestamp.valueOf(LocalDateTime.now());
+            var check = new UrlCheck(urlId, statusCode, title, h1, description, createdAt);
+            saveCheck(check);
+            ctx.sessionAttribute("checkType", "success");
+            ctx.sessionAttribute("check", "Страница успешно проверена");
+            ctx.redirect(NamedRoutes.urlPath(urlId));
+        } catch (RuntimeException e) {
+            ctx.sessionAttribute("checkType", "danger");
+            ctx.sessionAttribute("check", "Некорректный адрес");
+            ctx.redirect(NamedRoutes.urlsPath());
+        }
     }
-
     public static String getLatestCheckTime(Long urlId) {
         try {
             if (getChecks(urlId).isPresent() && !getChecks(urlId).get().isEmpty()) {

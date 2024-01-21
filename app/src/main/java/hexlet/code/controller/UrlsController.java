@@ -40,15 +40,18 @@ public class UrlsController {
                 .orElseThrow(() -> new NotFoundResponse("Url with id = " + id + " not found"));
         var urlChecks = getChecks(id).isPresent() ? getChecks(id).get() : new ArrayList<UrlCheck>();
         var page = new UrlPage(url, urlChecks);
+        page.setCheckType(ctx.consumeSessionAttribute("checkType"));
+        page.setCheck(ctx.consumeSessionAttribute("check"));
         ctx.render("urls/show.jte", Collections.singletonMap("page", page));
     }
 
-    public static void create(Context ctx) throws SQLException, RuntimeException {
+    public static void create(Context ctx) throws SQLException {
         var createdAt = Timestamp.valueOf(LocalDateTime.now());
         String str = ctx.formParam("url").trim();
         try {
             var name = new URI(str);
-            if (name.getScheme() == null || name.getAuthority() == null) {
+            if (name.getScheme() == null || name.getAuthority() == null
+                || name.getScheme().isEmpty() || name.getAuthority().isEmpty()) {
                 ctx.sessionAttribute("flashType", "danger");
                 ctx.sessionAttribute("flash", "Страница " + str + " некорректная");
             } else {
@@ -56,7 +59,7 @@ public class UrlsController {
                 var url = new Url(addressString, createdAt);
                 if (UrlsRepository.isInDatabase(addressString)) {
                     ctx.sessionAttribute("flashType", "danger");
-                    ctx.sessionAttribute("flash", "Страница " + str + " уже существует");
+                    ctx.sessionAttribute("flash", "Страница " + addressString + " уже существует");
                 } else {
                     UrlsRepository.save(url);
                     ctx.sessionAttribute("flashType", "success");
@@ -66,7 +69,6 @@ public class UrlsController {
         } catch (URISyntaxException e) {
             ctx.sessionAttribute("flashType", "danger");
             ctx.sessionAttribute("flash", "Некорректный URL");
-            throw new RuntimeException(e);
         }
         ctx.redirect(NamedRoutes.urlsPath());
     }
