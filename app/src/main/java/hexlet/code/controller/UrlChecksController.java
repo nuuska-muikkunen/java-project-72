@@ -28,16 +28,13 @@ public class UrlChecksController {
         }
         try {
             var response = Unirest.get(name).asString();
-            var body = response.getBody();
-            var statusCode = response.getStatus();
-            Document doc = Jsoup.parse(body);
-            var title = doc.title();
+            Document doc = Jsoup.parse(response.getBody());
             var h1 = doc.getElementsByTag("h1").isEmpty()
                     ? "" : doc.getElementsByTag("h1").html();
             var metaTags = doc.getElementsByAttributeValue("name", "description");
             var description = metaTags.isEmpty() ? "" : metaTags.get(0).attr("content");
             var createdAt = Timestamp.valueOf(LocalDateTime.now());
-            var check = new UrlCheck(urlId, statusCode, title, h1, description, createdAt);
+            var check = new UrlCheck(urlId, response.getStatus(), doc.title(), h1, description, createdAt);
             saveCheck(check);
             ctx.sessionAttribute("flashType", "success");
             ctx.sessionAttribute("flash", "Страница успешно проверена");

@@ -16,6 +16,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 
 import static hexlet.code.repository.UrlChecksRepository.getChecks;
+import static hexlet.code.repository.UrlsRepository.isInDatabase;
 
 public class UrlsController {
     public static void root(Context ctx) {
@@ -51,12 +52,11 @@ public class UrlsController {
                 ctx.sessionAttribute("flash", "Страница " + str + " некорректная");
             } else {
                 String addressString = name.getScheme() + "://" + name.getAuthority();
-                var url = new Url(addressString);
-                if (UrlsRepository.isInDatabase(addressString)) {
+                if (isInDatabase(addressString)) {
                     ctx.sessionAttribute("flashType", "danger");
                     ctx.sessionAttribute("flash", "Страница " + addressString + " уже существует");
                 } else {
-                    UrlsRepository.save(url);
+                    UrlsRepository.save(new Url(addressString));
                     ctx.sessionAttribute("flashType", "success");
                     ctx.sessionAttribute("flash", "Страница успешно добавлена");
                 }
