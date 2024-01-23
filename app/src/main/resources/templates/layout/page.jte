@@ -35,12 +35,6 @@
 
 <main class="flex-grow-1">
 
-    @if(page != null && page.getCheck() != null)
-        <div class="alert alert-${page.getCheckType()}" role="alert">
-            <p class="m-0">${page.getCheck()}</p>
-        </div>
-    @endif
-
     @if(page != null && page.getFlash() != null)
         <div class="alert alert-${page.getFlashType()}" role="alert">
                 <p class="m-0">${page.getFlash()}</p>

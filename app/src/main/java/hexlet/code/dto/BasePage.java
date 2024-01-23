@@ -8,7 +8,5 @@ import lombok.Setter;
 public class BasePage {
     private String flashType;
     private String flash;
-    private String checkType;
-    private String check;
 }
 

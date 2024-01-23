@@ -2,6 +2,8 @@ package hexlet.code.repository;
 
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.sql.Timestamp;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -14,7 +16,7 @@ public class UrlsRepository extends BaseRepository {
         try (var conn = dataSource.getConnection();
              var preparedStatement = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
             preparedStatement.setString(1, url.getName());
-            preparedStatement.setTimestamp(2, url.getCreatedAt());
+            preparedStatement.setTimestamp(2, Timestamp.valueOf(LocalDateTime.now()));
             preparedStatement.executeUpdate();
             var generatedKeys = preparedStatement.getGeneratedKeys();
             // Устанавливаем ID в сохраненную сущность
@@ -34,9 +36,9 @@ public class UrlsRepository extends BaseRepository {
             var resultSet = stmt.executeQuery();
             if (resultSet.next()) {
                 var name = resultSet.getString("name");
-                var createdAt = resultSet.getTimestamp("created_at");
-                var url = new Url(name, createdAt);
+                var url = new Url(name);
                 url.setId(id);
+                url.setCreatedAt(Timestamp.valueOf(LocalDateTime.now()));
                 return Optional.of(url);
             }
             return Optional.empty();
@@ -52,9 +54,9 @@ public class UrlsRepository extends BaseRepository {
             if (resultSet.next()) {
                 var id = resultSet.getLong("id");
                 var name = resultSet.getString("name");
-                var createdAt = resultSet.getTimestamp("created_at");
-                var url = new Url(name, createdAt);
+                var url = new Url(name);
                 url.setId(id);
+                url.setCreatedAt(Timestamp.valueOf(LocalDateTime.now()));
                 return Optional.of(url);
             }
             return Optional.empty();
@@ -62,12 +64,7 @@ public class UrlsRepository extends BaseRepository {
     }
 
     public static boolean isInDatabase(String name) throws SQLException {
-        var sql = "SELECT * FROM urls WHERE name = ?";
-        try (var conn = dataSource.getConnection();
-             var stmt = conn.prepareStatement(sql)) {
-            stmt.setString(1, name);
-            return stmt.executeQuery().next();
-        }
+        return search(name).isPresent();
     }
 
     public static List<Url> getEntities() throws SQLException {
@@ -79,10 +76,10 @@ public class UrlsRepository extends BaseRepository {
             while (resultSet.next()) {
                 var id = resultSet.getLong("id");
                 var name = resultSet.getString("name");
-                var createdAt = resultSet.getTimestamp("created_at");
-                var car = new Url(name, createdAt);
-                car.setId(id);
-                result.add(car);
+                var url = new Url(name);
+                url.setId(id);
+                url.setCreatedAt(Timestamp.valueOf(LocalDateTime.now()));
+                result.add(url);
             }
             return result;
         }

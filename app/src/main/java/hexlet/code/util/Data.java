@@ -19,9 +19,14 @@ public class Data {
     }
 
     public static String toDateString(Timestamp dateTimeStamp) {
-        var date = dateTimeStamp.toLocalDateTime();
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm");
-        return date.format(formatter);
+        if (dateTimeStamp != null) {
+            var date = dateTimeStamp.toLocalDateTime();
+            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm");
+            return date.format(formatter);
+        } else {
+            return "";
+        }
+
     }
 
 }

@@ -16,7 +16,6 @@ import org.jsoup.nodes.Document;
 
 import static hexlet.code.repository.UrlChecksRepository.saveCheck;
 import static hexlet.code.repository.UrlChecksRepository.getChecks;
-import static hexlet.code.util.Data.toDateString;
 
 public class UrlChecksController {
     public static void createCheck(Context ctx) throws SQLException, RuntimeException {
@@ -32,8 +31,7 @@ public class UrlChecksController {
             var body = response.getBody();
             var statusCode = response.getStatus();
             Document doc = Jsoup.parse(body);
-            var title = doc.getElementsByTag("title").isEmpty()
-                    ? "" : doc.getElementsByTag("title").html();
+            var title = doc.title();
             var h1 = doc.getElementsByTag("h1").isEmpty()
                     ? "" : doc.getElementsByTag("h1").html();
             var metaTags = doc.getElementsByAttributeValue("name", "description");
@@ -41,43 +39,26 @@ public class UrlChecksController {
             var createdAt = Timestamp.valueOf(LocalDateTime.now());
             var check = new UrlCheck(urlId, statusCode, title, h1, description, createdAt);
             saveCheck(check);
-            ctx.sessionAttribute("checkType", "success");
-            ctx.sessionAttribute("check", "Страница успешно проверена");
-            ctx.redirect(NamedRoutes.urlPath(urlId));
+            ctx.sessionAttribute("flashType", "success");
+            ctx.sessionAttribute("flash", "Страница успешно проверена");
         } catch (RuntimeException e) {
-            ctx.sessionAttribute("checkType", "danger");
-            ctx.sessionAttribute("check", "Некорректный адрес");
-            ctx.redirect(NamedRoutes.urlsPath());
+            ctx.sessionAttribute("flashType", "danger");
+            ctx.sessionAttribute("flash", "Некорректный адрес");
         }
-    }
-    public static String getLatestCheckTime(Long urlId) {
-        try {
-            if (getChecks(urlId).isPresent() && !getChecks(urlId).get().isEmpty()) {
-                return toDateString(getChecks(urlId).get().stream()
-                        .max(Comparator.comparing(UrlCheck::getCreatedAt))
-                        .get()
-                        .getCreatedAt());
-            } else {
-                return "";
-            }
-        } catch (SQLException e) {
-            return "";
-        }
+        ctx.redirect(NamedRoutes.urlPath(urlId));
     }
 
-    public static String getLatestCheckStatus(Long urlId) {
+    public static UrlCheck getLatestCheck(Long urlId) {
         try {
             if (getChecks(urlId).isPresent() && !getChecks(urlId).get().isEmpty()) {
                 return getChecks(urlId).get().stream()
                         .max(Comparator.comparing(UrlCheck::getCreatedAt))
-                        .get()
-                        .getStatusCode()
-                        .toString();
+                        .orElse(new UrlCheck());
             } else {
-                return "";
+                return new UrlCheck();
             }
         } catch (SQLException e) {
-            return "";
+            return new UrlCheck();
         }
     }
 

@@ -39,8 +39,8 @@ public class UrlChecksRepository extends BaseRepository {
             while (resultSet.next()) {
                 var id = resultSet.getLong("id");
                 var statusCode = resultSet.getInt("status_code");
-                var h1 = resultSet.getString("h1");
                 var title = resultSet.getString("title");
+                var h1 = resultSet.getString("h1");
                 var description = resultSet.getString("description");
                 var createdAt = resultSet.getTimestamp("created_at");
                 var check = new UrlCheck(urlId, statusCode, h1, title, description, createdAt);

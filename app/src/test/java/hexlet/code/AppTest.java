@@ -139,7 +139,7 @@ public class AppTest {
             response = client.get(NamedRoutes.urlPath("1"));
             bodyString = response.body().string();
             assertThat(bodyString).contains("свежие новости на РБК");
-            assertThat(bodyString).contains("на сайте rbc.ru");
+            assertThat(bodyString).contains("РосБизнесКонсалтинг");
         });
     }
 }
