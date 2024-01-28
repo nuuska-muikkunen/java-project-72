@@ -16,7 +16,7 @@ import java.sql.SQLException;
 import static hexlet.code.util.Utils.readResourceFile;
 import static org.assertj.core.api.Assertions.assertThat;
 
-public class cd AppTest {
+public class AppTest {
     private static Javalin app;
     private static String baseUrl;
     private static MockWebServer mockServer;
