@@ -13,10 +13,10 @@ import org.junit.jupiter.api.Test;
 import java.io.IOException;
 import java.sql.SQLException;
 
-import static hexlet.code.util.Data.readResourceFile;
+import static hexlet.code.util.Utils.readResourceFile;
 import static org.assertj.core.api.Assertions.assertThat;
 
-public class AppTest {
+public class cd AppTest {
     private static Javalin app;
     private static String baseUrl;
     private static MockWebServer mockServer;

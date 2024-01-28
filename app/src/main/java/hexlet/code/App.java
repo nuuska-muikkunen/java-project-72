@@ -9,7 +9,7 @@ import com.zaxxer.hikari.HikariConfig;
 import com.zaxxer.hikari.HikariDataSource;
 import hexlet.code.repository.BaseRepository;
 import hexlet.code.util.NamedRoutes;
-import static hexlet.code.util.Data.readResourceFile;
+import static hexlet.code.util.Utils.readResourceFile;
 
 import gg.jte.ContentType;
 import gg.jte.TemplateEngine;

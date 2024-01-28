@@ -1,7 +1,7 @@
 @import hexlet.code.dto.urls.UrlsPage
 @import hexlet.code.util.NamedRoutes
+@import java.time.format.DateTimeFormatter
 @import static hexlet.code.controller.UrlChecksController.getLatestCheck
-@import static hexlet.code.util.Data.toDateString
 
 @param UrlsPage page
 
@@ -9,6 +9,7 @@
 page = page,
 content = @`
     <div class="container-lg mt-5">
+    !{var formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm");}
         <h1>Сайты</h1>
         <table class="table table-bordered table-hover mt-3">
             <thead>
@@ -30,7 +31,9 @@ content = @`
                             <a href="${NamedRoutes.urlPath(url.getId())}">${url.getName()}</a>
                         </td>
                         <td>
-                            ${toDateString(getLatestCheck(url.getId()).getCreatedAt())}
+                            @if(getLatestCheck(url.getId()).getCreatedAt() != null)
+                                ${getLatestCheck(url.getId()).getCreatedAt().toLocalDateTime().format(formatter)}
+                            @endif
                         </td>
                         <td>
                             @if (getLatestCheck(url.getId()).getStatusCode() != null)
