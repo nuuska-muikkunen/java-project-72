@@ -9,13 +9,11 @@ import org.jsoup.Jsoup;
 import java.sql.SQLException;
 import java.time.LocalDateTime;
 import java.sql.Timestamp;
-import java.util.Comparator;
 
 import kong.unirest.Unirest;
 import org.jsoup.nodes.Document;
 
 import static hexlet.code.repository.UrlChecksRepository.saveCheck;
-import static hexlet.code.repository.UrlChecksRepository.getChecks;
 
 public class UrlChecksController {
     public static void createCheck(Context ctx) throws SQLException, RuntimeException {

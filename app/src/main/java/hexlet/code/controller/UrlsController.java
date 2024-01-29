@@ -2,7 +2,6 @@ package hexlet.code.controller;
 
 import hexlet.code.dto.BasePage;
 import hexlet.code.model.UrlCheck;
-import hexlet.code.repository.UrlChecksRepository;
 import io.javalin.http.Context;
 import io.javalin.http.NotFoundResponse;
 import hexlet.code.dto.urls.UrlPage;
@@ -11,7 +10,6 @@ import hexlet.code.model.Url;
 import hexlet.code.repository.UrlsRepository;
 import hexlet.code.util.NamedRoutes;
 
-import java.awt.*;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.sql.SQLException;
@@ -34,19 +32,19 @@ public class UrlsController {
     public static void index(Context ctx) throws SQLException {
         var urls = UrlsRepository.getEntities();
         HashMap<Url, UrlCheck> urlsWithChecks = new HashMap<>();
-            urls.stream()
-                    .peek(url -> {
-                        try {
-                            var urlCheck = getChecks(url.getId())
-                                    .orElse(new ArrayList<>())
-                                    .stream()
-                                    .max(Comparator.comparing(UrlCheck::getCreatedAt))
-                                    .orElse(new UrlCheck());
-                            urlsWithChecks.put(url, urlCheck);
-                        } catch (SQLException e) {
-                            throw new RuntimeException(e);
-                        }
-                    }).toList();
+        urls.stream()
+                .peek(url -> {
+                    try {
+                        var urlCheck = getChecks(url.getId())
+                                .orElse(new ArrayList<>())
+                                .stream()
+                                .max(Comparator.comparing(UrlCheck::getCreatedAt))
+                                .orElse(new UrlCheck());
+                        urlsWithChecks.put(url, urlCheck);
+                    } catch (SQLException e) {
+                        throw new RuntimeException(e);
+                    }
+                }).toList();
         var page = new UrlsPage(urlsWithChecks);
         page.setFlashType(ctx.consumeSessionAttribute("flashType"));
         page.setFlash(ctx.consumeSessionAttribute("flash"));
