@@ -1,7 +1,6 @@
 @import hexlet.code.dto.urls.UrlsPage
 @import hexlet.code.util.NamedRoutes
 @import java.time.format.DateTimeFormatter
-@import static hexlet.code.controller.UrlChecksController.getLatestCheck
 
 @param UrlsPage page
 
@@ -21,23 +20,24 @@ content = @`
                 </tr>
             </thead>
             <tbody>
-            @if(!page.getUrls().isEmpty())
-                @for(var url : page.getUrls())
+            @if(!page.getUrlsWithChecks().isEmpty())
+                @for(var urlWithCheck : page.getUrlsWithChecks().entrySet())
                     <tr>
                         <td>
-                            ${url.getId()}
+                            ${urlWithCheck.getKey().getId()}
                         </td>
                         <td>
-                            <a href="${NamedRoutes.urlPath(url.getId())}">${url.getName()}</a>
+                            <a href="${NamedRoutes.urlPath(urlWithCheck.getKey().getId())}">
+                                ${urlWithCheck.getKey().getName()}</a>
                         </td>
                         <td>
-                            @if(getLatestCheck(url.getId()).getCreatedAt() != null)
-                                ${getLatestCheck(url.getId()).getCreatedAt().toLocalDateTime().format(formatter)}
+                            @if(urlWithCheck.getValue().getCreatedAt() != null)
+                                ${urlWithCheck.getValue().getCreatedAt().toLocalDateTime().format(formatter)}
                             @endif
                         </td>
                         <td>
-                            @if (getLatestCheck(url.getId()).getStatusCode() != null)
-                                ${getLatestCheck(url.getId()).getStatusCode().toString()}
+                            @if (urlWithCheck.getValue().getStatusCode() != null)
+                                ${urlWithCheck.getValue().getStatusCode().toString()}
                             @endif
                         </td>
                     </tr>

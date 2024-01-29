@@ -38,25 +38,11 @@ public class UrlChecksController {
             saveCheck(check);
             ctx.sessionAttribute("flashType", "success");
             ctx.sessionAttribute("flash", "Страница успешно проверена");
+            ctx.redirect(NamedRoutes.urlPath(urlId));
         } catch (RuntimeException e) {
             ctx.sessionAttribute("flashType", "danger");
             ctx.sessionAttribute("flash", "Некорректный адрес");
-        }
-        ctx.redirect(NamedRoutes.urlPath(urlId));
-    }
-
-    public static UrlCheck getLatestCheck(Long urlId) {
-        try {
-            if (getChecks(urlId).isPresent() && !getChecks(urlId).get().isEmpty()) {
-                return getChecks(urlId).get().stream()
-                        .max(Comparator.comparing(UrlCheck::getCreatedAt))
-                        .orElse(new UrlCheck());
-            } else {
-                return new UrlCheck();
-            }
-        } catch (SQLException e) {
-            return new UrlCheck();
+            ctx.redirect(NamedRoutes.urlPath(urlId));
         }
     }
-
 }
