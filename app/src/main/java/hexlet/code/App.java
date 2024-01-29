@@ -24,18 +24,23 @@ public class App {
         return TemplateEngine.create(codeResolver, ContentType.Html);
     }
 
-    public static Javalin getApp() throws IOException, SQLException {
+    public static boolean isProduction() {
+        return System.getenv("JDBC_DATABASE_URL") != null;
+    }
 
+    public static HikariDataSource configureDatasource() {
         var hikariConfig = new HikariConfig();
-        var dataString = System.getenv("JDBC_DATABASE_URL");
-        if (dataString == null || dataString.equals("jdbc:h2:mem:hexlet_project")) {
-            hikariConfig.setJdbcUrl("jdbc:h2:mem:hexlet_project;DB_CLOSE_DELAY=-1;");
-        } else {
+        if (isProduction()) {
             hikariConfig.setUsername(System.getenv("JDBC_DATABASE_USERNAME"));
             hikariConfig.setPassword(System.getenv("JDBC_DATABASE_PASSWORD"));
-            hikariConfig.setJdbcUrl(dataString);
+            hikariConfig.setJdbcUrl(System.getenv("JDBC_DATABASE_URL"));
+        } else {
+            hikariConfig.setJdbcUrl("jdbc:h2:mem:hexlet_project;DB_CLOSE_DELAY=-1;");
         }
-        var dataSource = new HikariDataSource(hikariConfig);
+        return new HikariDataSource(hikariConfig);
+    }
+
+    public static void initializeDb(HikariDataSource dataSource) throws IOException, SQLException {
         var sql = readResourceFile("schema.sql");
 
         JavalinJte.init(createTemplateEngine());
@@ -46,9 +51,10 @@ public class App {
         }
 
         BaseRepository.dataSource = dataSource;
+    }
 
+    public static Javalin registerPaths() {
         var app = Javalin.create(config -> config.plugins.enableDevLogging());
-
         app.get(NamedRoutes.rootPath(), UrlsController::root);
         app.get(NamedRoutes.urlsPath(), UrlsController::index);
         app.post(NamedRoutes.urlsPath(), UrlsController::create);
@@ -56,9 +62,19 @@ public class App {
         app.post(NamedRoutes.checkPath("{id}"), UrlChecksController::createCheck);
         return app;
     }
+    public static Javalin getApp() throws IOException, SQLException {
+
+        var dataSource = configureDatasource();
+
+        initializeDb(dataSource);
+
+        var app = registerPaths();
+
+        return app;
+    }
     public static void main(String[] args) throws SQLException, IOException {
         Javalin app = getApp();
-        var portNumber = System.getenv("PORT") == null ? 7070 : Integer.parseInt(System.getenv("PORT"));
-        app.start(portNumber);
+        var portNumber = System.getenv().getOrDefault("PORT", "7070");
+        app.start(Integer.valueOf(portNumber));
     }
 }
