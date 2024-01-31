@@ -36,8 +36,8 @@
 <main class="flex-grow-1">
 
     @if(page != null && page.getFlash() != null)
-        <div class="alert alert-${page.getFlashType()}" role="alert">
-                <p class="m-0">${page.getFlash()}</p>
+        <div class="rounded-0 m-0 alert alert-dismissible fade show alert-${page.getFlashType()}" role="alert">
+            <p class="m-0">${page.getFlash()}</p>
         </div>
     @endif
 

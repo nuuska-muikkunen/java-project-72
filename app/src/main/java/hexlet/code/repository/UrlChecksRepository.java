@@ -3,9 +3,12 @@ package hexlet.code.repository;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
+import java.util.LinkedHashMap;
 import java.util.Optional;
 
+import hexlet.code.model.Url;
 import hexlet.code.model.UrlCheck;
+
 public class UrlChecksRepository extends BaseRepository {
     public static void saveCheck(UrlCheck check) throws SQLException {
         String sql = "INSERT INTO url_checks (url_id, status_code, title, h1, description, created_at)"
@@ -35,7 +38,7 @@ public class UrlChecksRepository extends BaseRepository {
              var stmt = conn.prepareStatement(sql)) {
             stmt.setLong(1, urlId);
             var resultSet = stmt.executeQuery();
-            var result = new ArrayList<UrlCheck>();
+            var     result = new ArrayList<UrlCheck>();
             while (resultSet.next()) {
                 var id = resultSet.getLong("id");
                 var statusCode = resultSet.getInt("status_code");
@@ -50,4 +53,35 @@ public class UrlChecksRepository extends BaseRepository {
             return Optional.of(result);
         }
     }
+
+    public static LinkedHashMap<Url, UrlCheck> getAllChecksOrdered() throws SQLException {
+        var sql = "SELECT DISTINCT ON (url_id) * from url_checks order by url_id DESC, id DESC";
+        LinkedHashMap<Url, UrlCheck> outputMap = new LinkedHashMap<>();
+        try (var conn = dataSource.getConnection();
+            var stmt = conn.prepareStatement(sql)) {
+            var resultSet = stmt.executeQuery();
+            var checks = new ArrayList<UrlCheck>();
+            while (resultSet.next()) {
+                var id = resultSet.getLong("id");
+                var urlId = resultSet.getLong("url_id");
+                var statusCode = resultSet.getInt("status_code");
+                var title = resultSet.getString("title");
+                var h1 = resultSet.getString("h1");
+                var description = resultSet.getString("description");
+                var createdAt = resultSet.getTimestamp("created_at");
+                var check = new UrlCheck(urlId, statusCode, h1, title, description, createdAt);
+                check.setId(id);
+                checks.add(check);
+            }
+            var urls = UrlsRepository.getEntities();
+            urls.stream()
+                    .peek(u -> {
+                        var urlCheckList = checks.stream().filter(c -> c.getUrlId() == u.getId()).toList();
+                        var lastCheck = urlCheckList.isEmpty() ? new UrlCheck() : urlCheckList.get(0);
+                        outputMap.put(u, lastCheck);
+                    }).toList();
+        }
+        return outputMap;
+    }
+
 }

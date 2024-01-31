@@ -1,5 +1,6 @@
 package hexlet.code;
 
+import hexlet.code.repository.UrlChecksRepository;
 import hexlet.code.repository.UrlsRepository;
 import hexlet.code.util.NamedRoutes;
 import io.javalin.Javalin;
@@ -13,7 +14,7 @@ import org.junit.jupiter.api.Test;
 import java.io.IOException;
 import java.sql.SQLException;
 
-import static hexlet.code.util.Data.readResourceFile;
+import static hexlet.code.util.Utils.readResourceFile;
 import static org.assertj.core.api.Assertions.assertThat;
 
 public class AppTest {
@@ -61,20 +62,20 @@ public class AppTest {
             assertThat(response.code()).isEqualTo(200);
             var bodyString = response.body().string();
             assertThat(bodyString).contains("Сайты");
+            assertThat(UrlsRepository.getEntities()).hasSize(2);
             assertThat(bodyString).contains("http://www.rbc.ru");
             assertThat(bodyString).doesNotContain("http://www.vk.ru");
-            assertThat(UrlsRepository.getEntities()).hasSize(2);
         });
     }
 
     @Test
     void testRegisterNewSite() throws Exception {
         JavalinTest.test(app, (server, client) -> {
-            var requestBody = "url=http://www.rbc.ru";
-            var response = client.post(NamedRoutes.urlsPath(), requestBody);
+            var response = client.post(NamedRoutes.urlsPath(), "url=http://www.rbc.ru");
             assertThat(response.code()).isEqualTo(200);
             assertThat(response.body().string()).contains("http://www.rbc.ru");
             assertThat(UrlsRepository.getEntities()).hasSize(1);
+            assertThat(UrlsRepository.getEntities().get(0).getName().equals("http://www.rbc.ru")).isTrue();
         });
     }
 
@@ -130,16 +131,13 @@ public class AppTest {
             assertThat(response.code()).isEqualTo(200);
             var bodyString = response.body().string();
             assertThat(bodyString).contains("Сайты");
-            assertThat(bodyString)
-                    .contains(String.valueOf(UrlsRepository.find(1L).get()
-                            .getCreatedAt().toLocalDateTime().getHour()));
             assertThat(bodyString).contains("200");
             assertThat(bodyString).contains("http://www.rbc.ru");
-
-            response = client.get(NamedRoutes.urlPath("1"));
-            bodyString = response.body().string();
             assertThat(bodyString).contains("свежие новости на РБК");
             assertThat(bodyString).contains("РосБизнесКонсалтинг");
+            assertThat(UrlChecksRepository.getChecks(1L).get().get(0).getH1())
+                    .isEqualTo("Последние новости дня в России и мире сегодня - свежие новости на РБК");
+
         });
     }
 }

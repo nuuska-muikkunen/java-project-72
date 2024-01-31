@@ -1,7 +1,7 @@
 @import hexlet.code.dto.urls.UrlsPage
+@import hexlet.code.model.Url
 @import hexlet.code.util.NamedRoutes
-@import static hexlet.code.controller.UrlChecksController.getLatestCheck
-@import static hexlet.code.util.Data.toDateString
+@import java.time.format.DateTimeFormatter
 
 @param UrlsPage page
 
@@ -9,19 +9,20 @@
 page = page,
 content = @`
     <div class="container-lg mt-5">
+        !{var formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm");}
         <h1>Сайты</h1>
         <table class="table table-bordered table-hover mt-3">
             <thead>
-                <tr>
-                    <th class="col-1">ID</th>
-                    <th>Имя</th>
-                    <th class="col-2">Последняя проверка</th>
-                    <th class="col-1">Код ответа</th>
-                </tr>
+            <tr>
+                <th class="col-1">ID</th>
+                <th>Имя</th>
+                <th class="col-2">Последняя проверка</th>
+                <th class="col-1">Код ответа</th>
+            </tr>
             </thead>
             <tbody>
-            @if(!page.getUrls().isEmpty())
-                @for(var url : page.getUrls())
+            @if(!page.getUrlsWithChecks().isEmpty())
+                @for(Url url : page.getUrlsWithChecks().keySet())
                     <tr>
                         <td>
                             ${url.getId()}
@@ -30,11 +31,13 @@ content = @`
                             <a href="${NamedRoutes.urlPath(url.getId())}">${url.getName()}</a>
                         </td>
                         <td>
-                            ${toDateString(getLatestCheck(url.getId()).getCreatedAt())}
+                            @if(page.getUrlsWithChecks().get(url).getCreatedAt() != null)
+                                ${page.getUrlsWithChecks().get(url).getCreatedAt().toLocalDateTime().format(formatter)}
+                            @endif
                         </td>
                         <td>
-                            @if (getLatestCheck(url.getId()).getStatusCode() != null)
-                                ${getLatestCheck(url.getId()).getStatusCode().toString()}
+                            @if(page.getUrlsWithChecks().get(url).getStatusCode() != null)
+                                ${page.getUrlsWithChecks().get(url).getStatusCode().toString()}
                             @endif
                         </td>
                     </tr>

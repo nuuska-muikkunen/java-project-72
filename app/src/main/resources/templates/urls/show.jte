@@ -1,12 +1,14 @@
 @import hexlet.code.dto.urls.UrlPage
 @import hexlet.code.util.NamedRoutes
-@import static hexlet.code.util.Data.toDateString
+@import java.time.format.DateTimeFormatter
 
 @param UrlPage page
 
 @template.layout.page(
+page = page,
 content = @`
     <div class="container-lg mt-5">
+        !{var formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm");}
         <h1>Сайт:${page.getUrl().getName()}</h1>
         <table class="table table-bordered table-hover mt-3">
             <tbody>
@@ -31,7 +33,7 @@ content = @`
                         Дата создания
                     </td>
                     <td>
-                        ${toDateString(page.getUrl().getCreatedAt())}
+                        ${page.getUrl().getCreatedAt().toLocalDateTime().format(formatter)}
                     </td>
                 </tr>
             </tbody>
@@ -71,7 +73,7 @@ content = @`
                         ${check.getDescription()}
                     </td>
                     <td>
-                        ${toDateString(check.getCreatedAt())}
+                        ${check.getCreatedAt().toLocalDateTime().format(formatter)}
                     </td>
                 </tr>
             @endfor

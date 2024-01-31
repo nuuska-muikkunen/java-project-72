@@ -4,9 +4,9 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.sql.Timestamp;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Optional;
+import java.util.List;
+import java.util.ArrayList;
 
 import hexlet.code.model.Url;
 
@@ -19,7 +19,6 @@ public class UrlsRepository extends BaseRepository {
             preparedStatement.setTimestamp(2, Timestamp.valueOf(LocalDateTime.now()));
             preparedStatement.executeUpdate();
             var generatedKeys = preparedStatement.getGeneratedKeys();
-            // Устанавливаем ID в сохраненную сущность
             if (generatedKeys.next()) {
                 url.setId(generatedKeys.getLong(1));
             } else {
@@ -28,7 +27,7 @@ public class UrlsRepository extends BaseRepository {
         }
     }
 
-    public static Optional<Url> find(Long id) throws SQLException {
+    public static Optional<Url> findById(Long id) throws SQLException {
         var sql = "SELECT * FROM urls WHERE id = ?";
         try (var conn = dataSource.getConnection();
              var stmt = conn.prepareStatement(sql)) {
@@ -45,7 +44,7 @@ public class UrlsRepository extends BaseRepository {
         }
     }
 
-    public static Optional<Url> search(String address) throws SQLException {
+    public static Optional<Url> findByName(String address) throws SQLException {
         var sql = "SELECT * FROM urls WHERE name = ?";
         try (var conn = dataSource.getConnection();
              var stmt = conn.prepareStatement(sql)) {
@@ -64,15 +63,15 @@ public class UrlsRepository extends BaseRepository {
     }
 
     public static boolean isInDatabase(String name) throws SQLException {
-        return search(name).isPresent();
+        return findByName(name).isPresent();
     }
 
     public static List<Url> getEntities() throws SQLException {
         var sql = "SELECT * FROM urls";
+        List<Url> result = new ArrayList<>();
         try (var conn = dataSource.getConnection();
              var stmt = conn.prepareStatement(sql)) {
             var resultSet = stmt.executeQuery();
-            var result = new ArrayList<Url>();
             while (resultSet.next()) {
                 var id = resultSet.getLong("id");
                 var name = resultSet.getString("name");
@@ -84,4 +83,25 @@ public class UrlsRepository extends BaseRepository {
             return result;
         }
     }
+//
+//    public static LinkedHashMap<Url, UrlCheck> getEntities() throws SQLException {
+//        var sql = "SELECT * FROM urls";
+//        LinkedHashMap<Url, UrlCheck> outputMap = new LinkedHashMap<>();
+//        try (var conn = dataSource.getConnection();
+//             var stmt = conn.prepareStatement(sql)) {
+//            var resultSet = stmt.executeQuery();
+//            while (resultSet.next()) {
+//                var id = resultSet.getLong("id");
+//                var name = resultSet.getString("name");
+//                var url = new Url(name);
+//                url.setId(id);
+//                url.setCreatedAt(Timestamp.valueOf(LocalDateTime.now()));
+//                var check = UrlChecksRepository.getChecks(url.getId()).orElse(new ArrayList<>()).stream()
+//                        .max(Comparator.comparing(UrlCheck::getCreatedAt)).orElse(new UrlCheck());
+//                outputMap.put(url, check);
+//            }
+//            return outputMap;
+//        }
+//    }
+
 }
