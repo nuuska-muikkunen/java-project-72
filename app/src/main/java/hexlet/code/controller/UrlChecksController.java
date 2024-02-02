@@ -36,12 +36,11 @@ public class UrlChecksController {
             saveCheck(check);
             ctx.sessionAttribute("flashType", "success");
             ctx.sessionAttribute("flash", "Страница успешно проверена");
-            ctx.redirect(NamedRoutes.urlPath(urlId));
         } catch (RuntimeException e) {
             ctx.sessionAttribute("flashType", "danger");
             ctx.sessionAttribute("flash", "Некорректный адрес");
-            ctx.redirect(NamedRoutes.urlPath(urlId));
         }
+        ctx.redirect(NamedRoutes.urlPath(urlId));
     }
 
 }

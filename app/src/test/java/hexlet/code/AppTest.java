@@ -134,7 +134,7 @@ public class AppTest {
             assertThat(bodyString).contains("200");
             assertThat(bodyString).contains("http://www.rbc.ru");
             assertThat(bodyString).contains("свежие новости на РБК");
-            assertThat(bodyString).contains("РосБизнесКонсалтинг");
+            assertThat(bodyString).contains("биржевых систем на сайте rbc.ru");
             assertThat(UrlChecksRepository.getChecks(1L).get().get(0).getH1())
                     .isEqualTo("Последние новости дня в России и мире сегодня - свежие новости на РБК");
 
