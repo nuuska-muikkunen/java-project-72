@@ -29,9 +29,8 @@ public class App {
     }
 
     private static boolean isProduction() {
-        var dataString = System.getenv()
-                .getOrDefault("JDBC_DATABASE_URL", "jdbc:h2:mem:hexlet_project;DB_CLOSE_DELAY=-1");
-        return dataString == null;
+        var dataString = System.getenv("JDBC_DATABASE_URL");
+        return dataString != null;
     }
 
     private static HikariDataSource configureDatasource() {
