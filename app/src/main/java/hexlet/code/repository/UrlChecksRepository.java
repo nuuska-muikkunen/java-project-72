@@ -57,14 +57,35 @@ public class UrlChecksRepository extends BaseRepository {
         }
     }
 
+    public static Optional<UrlCheck> getLastCheck(Long urlId) throws SQLException {
+        var sql = "SELECT * FROM url_checks WHERE url_id = ? ORDER BY id DESC LIMIT 1";
+        try (var conn = dataSource.getConnection();
+             var stmt = conn.prepareStatement(sql)) {
+            stmt.setLong(1, urlId);
+            var resultSet = stmt.executeQuery();
+            var check = new UrlCheck();
+            while (resultSet.next()) {
+                var id = resultSet.getLong("id");
+                var statusCode = resultSet.getInt("status_code");
+                var title = resultSet.getString("title");
+                var h1 = resultSet.getString("h1");
+                var description = resultSet.getString("description");
+                var createdAt = resultSet.getTimestamp("created_at");
+                check = new UrlCheck(urlId, statusCode, h1, title, description);
+                check.setId(id);
+                check.setCreatedAt(createdAt);
+            }
+            return Optional.of(check);
+        }
+    }
+
     public static LinkedHashMap<Url, UrlCheck> getUrlsWithLastChecks() throws SQLException {
         LinkedHashMap<Url, UrlCheck> outputMap = new LinkedHashMap<>();
         var urls = UrlsRepository.getEntities();
         urls.stream()
             .peek(u -> {
                 try {
-                    var urlChecks = getChecks(u.getId()).orElse(new ArrayList<>());
-                    var lastCheck = urlChecks.isEmpty() ? new UrlCheck() : urlChecks.get(0);
+                    var lastCheck = getLastCheck(u.getId()).orElse(new UrlCheck());
                     outputMap.put(u, lastCheck);
                 } catch (SQLException e) {
                     outputMap.put(u, new UrlCheck());

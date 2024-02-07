@@ -83,25 +83,5 @@ public class UrlsRepository extends BaseRepository {
             return result;
         }
     }
-//
-//    public static LinkedHashMap<Url, UrlCheck> getEntities() throws SQLException {
-//        var sql = "SELECT * FROM urls";
-//        LinkedHashMap<Url, UrlCheck> outputMap = new LinkedHashMap<>();
-//        try (var conn = dataSource.getConnection();
-//             var stmt = conn.prepareStatement(sql)) {
-//            var resultSet = stmt.executeQuery();
-//            while (resultSet.next()) {
-//                var id = resultSet.getLong("id");
-//                var name = resultSet.getString("name");
-//                var url = new Url(name);
-//                url.setId(id);
-//                url.setCreatedAt(Timestamp.valueOf(LocalDateTime.now()));
-//                var check = UrlChecksRepository.getChecks(url.getId()).orElse(new ArrayList<>()).stream()
-//                        .max(Comparator.comparing(UrlCheck::getCreatedAt)).orElse(new UrlCheck());
-//                outputMap.put(url, check);
-//            }
-//            return outputMap;
-//        }
-//    }
 
 }
