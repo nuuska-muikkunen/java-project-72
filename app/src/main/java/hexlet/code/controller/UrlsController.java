@@ -29,7 +29,7 @@ public class UrlsController {
     }
 
     public static void index(Context ctx) throws SQLException {
-        var urlsWithChecks = UrlChecksRepository.getAllChecksOrdered();
+        var urlsWithChecks = UrlChecksRepository.getUrlsWithLastChecks();
         var page = new UrlsPage(urlsWithChecks);
         page.setFlashType(ctx.consumeSessionAttribute("flashType"));
         page.setFlash(ctx.consumeSessionAttribute("flash"));
@@ -43,8 +43,8 @@ public class UrlsController {
         var urlChecks = getChecks(id).isPresent()
                 ? getChecks(id).get() : new ArrayList<UrlCheck>();
         var page = new UrlPage(url, urlChecks);
-        page.setFlashType((String) ctx.consumeSessionAttribute("flashType"));
-        page.setFlash((String) ctx.consumeSessionAttribute("flash"));
+        page.setFlashType(ctx.consumeSessionAttribute("flashType"));
+        page.setFlash(ctx.consumeSessionAttribute("flash"));
         ctx.render("urls/show.jte", Collections.singletonMap("page", page));
     }
 

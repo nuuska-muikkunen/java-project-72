@@ -35,7 +35,7 @@ public class UrlChecksRepository extends BaseRepository {
     }
 
     public static Optional<ArrayList<UrlCheck>> getChecks(Long urlId) throws SQLException {
-        var sql = "SELECT * FROM url_checks WHERE url_id = ?";
+        var sql = "SELECT * FROM url_checks WHERE url_id = ? ORDER BY id DESC";
         try (var conn = dataSource.getConnection();
              var stmt = conn.prepareStatement(sql)) {
             stmt.setLong(1, urlId);
@@ -57,35 +57,19 @@ public class UrlChecksRepository extends BaseRepository {
         }
     }
 
-    public static LinkedHashMap<Url, UrlCheck> getAllChecksOrdered() throws SQLException {
-        var sql = "SELECT DISTINCT ON (url_id) * from url_checks order by url_id DESC, id DESC";
+    public static LinkedHashMap<Url, UrlCheck> getUrlsWithLastChecks() throws SQLException {
         LinkedHashMap<Url, UrlCheck> outputMap = new LinkedHashMap<>();
-        try (var conn = dataSource.getConnection();
-            var stmt = conn.prepareStatement(sql)) {
-            var resultSet = stmt.executeQuery();
-            var checks = new ArrayList<UrlCheck>();
-            while (resultSet.next()) {
-                var id = resultSet.getLong("id");
-                var urlId = resultSet.getLong("url_id");
-                var statusCode = resultSet.getInt("status_code");
-                var title = resultSet.getString("title");
-                var h1 = resultSet.getString("h1");
-                var description = resultSet.getString("description");
-                var createdAt = resultSet.getTimestamp("created_at");
-                var check = new UrlCheck(urlId, statusCode, h1, title, description);
-                check.setId(id);
-                check.setCreatedAt(createdAt);
-                checks.add(check);
-            }
-            var urls = UrlsRepository.getEntities();
-            urls.stream()
-                    .peek(u -> {
-                        var urlCheckList = checks.stream().filter(c -> c.getUrlId() == u.getId()).toList();
-                        var lastCheck = urlCheckList.isEmpty() ? new UrlCheck() : urlCheckList.get(0);
-                        outputMap.put(u, lastCheck);
-                    }).toList();
-        }
+        var urls = UrlsRepository.getEntities();
+        urls.stream()
+            .peek(u -> {
+                try {
+                    var urlChecks = getChecks(u.getId()).orElse(new ArrayList<>());
+                    var lastCheck = urlChecks.isEmpty() ? new UrlCheck() : urlChecks.get(0);
+                    outputMap.put(u, lastCheck);
+                } catch (SQLException e) {
+                    outputMap.put(u, new UrlCheck());
+                }
+            }).toList();
         return outputMap;
     }
-
 }
