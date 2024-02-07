@@ -49,10 +49,11 @@ public class AppTest {
             assertThat(response.code()).isEqualTo(200);
             assertThat(response.body().string()).contains("Анализатор страниц");
         });
+
     }
 
     @Test
-    void testIndex() throws Exception {
+    void testRegisterNewSites() throws Exception {
         JavalinTest.test(app, (server, client) -> {
             var requestBody = "url=http://www.rbc.ru";
             client.post(NamedRoutes.urlsPath(), requestBody);
@@ -64,18 +65,7 @@ public class AppTest {
             assertThat(bodyString).contains("Сайты");
             assertThat(UrlsRepository.getEntities()).hasSize(2);
             assertThat(bodyString).contains("http://www.rbc.ru");
-            assertThat(bodyString).doesNotContain("http://www.vk.ru");
-        });
-    }
-
-    @Test
-    void testRegisterNewSite() throws Exception {
-        JavalinTest.test(app, (server, client) -> {
-            var response = client.post(NamedRoutes.urlsPath(), "url=http://www.rbc.ru");
-            assertThat(response.code()).isEqualTo(200);
-            assertThat(response.body().string()).contains("http://www.rbc.ru");
-            assertThat(UrlsRepository.getEntities()).hasSize(1);
-            assertThat(UrlsRepository.getEntities().get(0).getName().equals("http://www.rbc.ru")).isTrue();
+            assertThat(bodyString).contains("http://www.mail.ru");
         });
     }
 
@@ -112,7 +102,8 @@ public class AppTest {
         JavalinTest.test(app, (server, client) -> {
             var requestBody = "url=http://www.rbc.ru";
             client.post(NamedRoutes.urlsPath(), requestBody);
-            var response = client.get(NamedRoutes.urlPath("1"));
+            var id = UrlsRepository.findByName("http://www.rbc.ru").get().getId();
+            var response = client.get(NamedRoutes.urlPath(id));
             assertThat(response.code()).isEqualTo(200);
             var bodyString = response.body().string();
             assertThat(bodyString).contains("Сайт:");
@@ -126,8 +117,8 @@ public class AppTest {
         JavalinTest.test(app, (server, client) -> {
             var requestBody = "url=http://www.rbc.ru";
             client.post(NamedRoutes.urlsPath(), requestBody);
-
-            var response = client.post(NamedRoutes.checkPath("1"));
+            var id = UrlsRepository.findByName("http://www.rbc.ru").get().getId();
+            var response = client.post(NamedRoutes.checkPath(id));
             assertThat(response.code()).isEqualTo(200);
             var bodyString = response.body().string();
             assertThat(bodyString).contains("Сайты");

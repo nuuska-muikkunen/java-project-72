@@ -7,8 +7,6 @@ import hexlet.code.repository.UrlsRepository;
 import org.jsoup.Jsoup;
 
 import java.sql.SQLException;
-import java.time.LocalDateTime;
-import java.sql.Timestamp;
 
 import kong.unirest.Unirest;
 import org.jsoup.nodes.Document;
@@ -31,8 +29,7 @@ public class UrlChecksController {
                     ? "" : doc.getElementsByTag("h1").html();
             var metaTags = doc.getElementsByAttributeValue("name", "description");
             var description = metaTags.isEmpty() ? "" : metaTags.get(0).attr("content");
-            var createdAt = Timestamp.valueOf(LocalDateTime.now());
-            var check = new UrlCheck(urlId, response.getStatus(), doc.title(), h1, description, createdAt);
+            var check = new UrlCheck(urlId, response.getStatus(), doc.title(), h1, description);
             saveCheck(check);
             ctx.sessionAttribute("flashType", "success");
             ctx.sessionAttribute("flash", "Страница успешно проверена");

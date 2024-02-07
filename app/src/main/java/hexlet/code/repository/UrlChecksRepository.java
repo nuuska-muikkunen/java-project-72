@@ -2,6 +2,8 @@ package hexlet.code.repository;
 
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.sql.Timestamp;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.Optional;
@@ -20,7 +22,7 @@ public class UrlChecksRepository extends BaseRepository {
             preparedStatement.setString(3, check.getTitle());
             preparedStatement.setString(4, check.getH1());
             preparedStatement.setString(5, check.getDescription());
-            preparedStatement.setTimestamp(6, check.getCreatedAt());
+            preparedStatement.setTimestamp(6, Timestamp.valueOf(LocalDateTime.now()));
             preparedStatement.executeUpdate();
             var generatedKeys = preparedStatement.getGeneratedKeys();
             // Устанавливаем ID в сохраненную сущность
@@ -46,8 +48,9 @@ public class UrlChecksRepository extends BaseRepository {
                 var h1 = resultSet.getString("h1");
                 var description = resultSet.getString("description");
                 var createdAt = resultSet.getTimestamp("created_at");
-                var check = new UrlCheck(urlId, statusCode, h1, title, description, createdAt);
+                var check = new UrlCheck(urlId, statusCode, h1, title, description);
                 check.setId(id);
+                check.setCreatedAt(createdAt);
                 result.add(check);
             }
             return Optional.of(result);
@@ -69,8 +72,9 @@ public class UrlChecksRepository extends BaseRepository {
                 var h1 = resultSet.getString("h1");
                 var description = resultSet.getString("description");
                 var createdAt = resultSet.getTimestamp("created_at");
-                var check = new UrlCheck(urlId, statusCode, h1, title, description, createdAt);
+                var check = new UrlCheck(urlId, statusCode, h1, title, description);
                 check.setId(id);
+                check.setCreatedAt(createdAt);
                 checks.add(check);
             }
             var urls = UrlsRepository.getEntities();
