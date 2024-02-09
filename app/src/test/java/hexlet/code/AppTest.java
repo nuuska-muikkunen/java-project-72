@@ -16,6 +16,8 @@ import java.sql.SQLException;
 
 import static hexlet.code.util.Utils.readResourceFile;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class AppTest {
     private static Javalin app;
@@ -62,8 +64,14 @@ public class AppTest {
             var response = client.get(NamedRoutes.urlsPath());
             assertThat(response.code()).isEqualTo(200);
             var bodyString = response.body().string();
-            assertThat(bodyString).contains("Сайты");
             assertThat(UrlsRepository.getEntities()).hasSize(2);
+            assertTrue(UrlsRepository.findByName("http://www.rbc.ru").isPresent());
+            assertEquals("http://www.rbc.ru",
+                    UrlsRepository.findByName("http://www.rbc.ru").get().getName());
+            assertTrue(UrlsRepository.findByName("http://www.mail.ru").isPresent());
+            assertEquals("http://www.mail.ru",
+                    UrlsRepository.findByName("http://www.mail.ru").get().getName());
+            assertThat(bodyString).contains("Сайты");
             assertThat(bodyString).contains("http://www.rbc.ru");
             assertThat(bodyString).contains("http://www.mail.ru");
         });

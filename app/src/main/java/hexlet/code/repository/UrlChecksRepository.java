@@ -80,17 +80,50 @@ public class UrlChecksRepository extends BaseRepository {
     }
 
     public static LinkedHashMap<Url, UrlCheck> getUrlsWithLastChecks() throws SQLException {
-        LinkedHashMap<Url, UrlCheck> outputMap = new LinkedHashMap<>();
         var urls = UrlsRepository.getEntities();
+        LinkedHashMap<Url, UrlCheck> outputMap = new LinkedHashMap<>();
         urls.stream()
-            .peek(u -> {
-                try {
-                    var lastCheck = getLastCheck(u.getId()).orElse(new UrlCheck());
-                    outputMap.put(u, lastCheck);
-                } catch (SQLException e) {
-                    outputMap.put(u, new UrlCheck());
-                }
-            }).toList();
+                .peek(u -> {
+                    try {
+                        var lastCheck = getLastCheck(u.getId()).orElse(new UrlCheck());
+                        outputMap.put(u, lastCheck);
+                    } catch (SQLException e) {
+                        outputMap.put(u, new UrlCheck());
+                    }
+                }).toList();
         return outputMap;
     }
+
 }
+
+//    public static Optional<ArrayList<UrlCheck>> getAllChecks(Long urlId, String string) throws SQLException {
+//        var sql = "SELECT * FROM url_checks WHERE url_id = ? ORDER BY id DESC" + string;
+//        try (var conn = dataSource.getConnection();
+//             var stmt = conn.prepareStatement(sql)) {
+//            stmt.setLong(1, urlId);
+//            var resultSet = stmt.executeQuery();
+//            var     result = new ArrayList<UrlCheck>();
+//            while (resultSet.next()) {
+//                var id = resultSet.getLong("id");
+//                var statusCode = resultSet.getInt("status_code");
+//                var title = resultSet.getString("title");
+//                var h1 = resultSet.getString("h1");
+//                var description = resultSet.getString("description");
+//                var createdAt = resultSet.getTimestamp("created_at");
+//                var check = new UrlCheck(urlId, statusCode, h1, title, description);
+//                check.setId(id);
+//                check.setCreatedAt(createdAt);
+//                result.add(check);
+//            }
+//            return Optional.of(result);
+//        }
+//    }
+//
+//    public static UrlCheck getLastCheck(Long urlId) throws SQLException {
+//        var checkList = getAllChecks(urlId, " LIMIT 1").orElse(new ArrayList<>());
+//        return checkList.isEmpty() ? new UrlCheck() : checkList.get(0);
+//    }
+//
+//    public static Optional<ArrayList<UrlCheck>> getChecks(Long urlId) throws SQLException {
+//        return getAllChecks(urlId, "");
+//    }
