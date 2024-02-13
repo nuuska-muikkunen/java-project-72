@@ -29,7 +29,7 @@ public class UrlChecksController {
                     ? "" : doc.getElementsByTag("h1").html();
             var metaTags = doc.getElementsByAttributeValue("name", "description");
             var description = metaTags.isEmpty() ? "" : metaTags.get(0).attr("content");
-            var check = new UrlCheck(urlId, response.getStatus(), doc.title(), h1, description);
+            var check = new UrlCheck(urlId, response.getStatus(), h1, doc.title(), description);
             saveCheck(check);
             ctx.sessionAttribute("flashType", "success");
             ctx.sessionAttribute("flash", "Страница успешно проверена");

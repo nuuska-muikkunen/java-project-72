@@ -1,5 +1,6 @@
 package hexlet.code;
 
+import hexlet.code.model.Url;
 import hexlet.code.repository.UrlChecksRepository;
 import hexlet.code.repository.UrlsRepository;
 import hexlet.code.util.NamedRoutes;
@@ -21,15 +22,13 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class AppTest {
     private static Javalin app;
-    private static String baseUrl;
     private static MockWebServer mockServer;
+    private static String baseUrl;
     private static int port;
 
     @BeforeAll
     public static void beforeAll() throws IOException {
         mockServer = new MockWebServer();
-        baseUrl = mockServer.url("/").toString();
-        port = mockServer.getPort();
         var mockResponse = new MockResponse().setBody(readResourceFile("index.html"));
         mockServer.enqueue(mockResponse);
     }
@@ -55,7 +54,7 @@ public class AppTest {
     }
 
     @Test
-    void testRegisterNewSites() throws Exception {
+    void testRegisterNewSites() {
         JavalinTest.test(app, (server, client) -> {
             var requestBody = "url=http://www.rbc.ru";
             client.post(NamedRoutes.urlsPath(), requestBody);
@@ -78,7 +77,7 @@ public class AppTest {
     }
 
     @Test
-    void testWrongSite() throws Exception {
+    void testWrongSite() {
         JavalinTest.test(app, (server, client) -> {
             var requestBody = "url=http://www.rbc.ru";
             client.post(NamedRoutes.urlsPath(), requestBody);
@@ -96,7 +95,7 @@ public class AppTest {
     }
 
     @Test
-    void testDoubleSite() throws Exception {
+    void testDoubleSite() {
         JavalinTest.test(app, (server, client) -> {
             var requestBody = "url=http://www.rbc.ru";
             client.post(NamedRoutes.urlsPath(), requestBody);
@@ -106,7 +105,7 @@ public class AppTest {
     }
 
     @Test
-    void testShowUrl() throws Exception {
+    void testShowUrl() {
         JavalinTest.test(app, (server, client) -> {
             var requestBody = "url=http://www.rbc.ru";
             client.post(NamedRoutes.urlsPath(), requestBody);
@@ -121,22 +120,21 @@ public class AppTest {
     }
 
     @Test
-    void testCheckUrl() throws Exception {
+    void testCheckUrl() throws IOException, SQLException {
+        var url = mockServer.url("/").toString();
+        Url urlForCheck = new Url(url);
+        UrlsRepository.save(urlForCheck);
         JavalinTest.test(app, (server, client) -> {
-            var requestBody = "url=http://www.rbc.ru";
-            client.post(NamedRoutes.urlsPath(), requestBody);
-            var id = UrlsRepository.findByName("http://www.rbc.ru").get().getId();
-            var response = client.post(NamedRoutes.checkPath(id));
+            var response = client.post(NamedRoutes.checkPath(urlForCheck.getId()));
             assertThat(response.code()).isEqualTo(200);
-            var bodyString = response.body().string();
-            assertThat(bodyString).contains("Сайты");
-            assertThat(bodyString).contains("200");
-            assertThat(bodyString).contains("http://www.rbc.ru");
-            assertThat(bodyString).contains("свежие новости на РБК");
-            assertThat(bodyString).contains("биржевых систем на сайте rbc.ru");
-            assertThat(UrlChecksRepository.getChecks(1L).get().get(0).getH1())
-                    .isEqualTo("Последние новости дня в России и мире сегодня - свежие новости на РБК");
-
+            var lastCheck = UrlChecksRepository.getLastCheck(urlForCheck.getId()).get();
+            System.out.println("title= " + lastCheck.getTitle()
+                    + " h1= " + lastCheck.getH1()
+                    + " Descr= " + lastCheck.getDescription());
+            assertThat(lastCheck.getTitle()).isEqualTo("Title");
+            assertThat(lastCheck.getH1()).isEqualTo("This is a header");
+            assertThat(lastCheck.getDescription()).contains("description");
         });
     }
+
 }
