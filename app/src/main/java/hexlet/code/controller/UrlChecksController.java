@@ -27,9 +27,9 @@ public class UrlChecksController {
             var response = Unirest.get(name).asString();
             Document doc = Jsoup.parse(response.getBody());
             var title = doc.title();
-            var h1 = Objects.requireNonNull(doc.body().selectFirst("h1"))
+            var h1 = Objects.requireNonNull(doc.selectFirst("h1"))
                     .getElementsByTag("h1").isEmpty()
-                    ? "" : Objects.requireNonNull(doc.body().selectFirst("h1"))
+                    ? "" : Objects.requireNonNull(doc.selectFirst("h1"))
                     .getElementsByTag("h1").html();
             var metaTags = doc.getElementsByAttributeValue("name", "description");
             var description = metaTags.isEmpty() ? "" : metaTags.get(0).attr("content");
@@ -39,7 +39,7 @@ public class UrlChecksController {
             ctx.sessionAttribute("flash", "Страница успешно проверена");
         } catch (RuntimeException e) {
             ctx.sessionAttribute("flashType", "danger");
-            ctx.sessionAttribute("flash", "Некорректный адрес");
+            ctx.sessionAttribute("flash", "Некорректный URL");
         }
         ctx.redirect(NamedRoutes.urlPath(urlId));
     }

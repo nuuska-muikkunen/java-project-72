@@ -54,9 +54,10 @@ public class UrlsRepository extends BaseRepository {
             if (resultSet.next()) {
                 var id = resultSet.getLong("id");
                 var name = resultSet.getString("name");
+                var time = resultSet.getTimestamp("created_at");
                 var url = new Url(name);
                 url.setId(id);
-                url.setCreatedAt(Timestamp.valueOf(LocalDateTime.now()));
+                url.setCreatedAt(time);
                 return Optional.of(url);
             }
             return Optional.empty();
@@ -76,9 +77,10 @@ public class UrlsRepository extends BaseRepository {
             while (resultSet.next()) {
                 var id = resultSet.getLong("id");
                 var name = resultSet.getString("name");
+                var time = resultSet.getTimestamp("created_at");
                 var url = new Url(name);
                 url.setId(id);
-                url.setCreatedAt(Timestamp.valueOf(LocalDateTime.now()));
+                url.setCreatedAt(time);
                 result.add(url);
             }
             return result;
