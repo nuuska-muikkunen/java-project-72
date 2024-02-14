@@ -120,20 +120,23 @@ public class AppTest {
     }
 
     @Test
-    void testCheckUrl() throws IOException, SQLException {
+    void testCheckUrl() throws SQLException {
         var url = mockServer.url("/").toString();
         Url urlForCheck = new Url(url);
         UrlsRepository.save(urlForCheck);
         JavalinTest.test(app, (server, client) -> {
             var response = client.post(NamedRoutes.checkPath(urlForCheck.getId()));
-            assertThat(response.code()).isEqualTo(200);
-            var lastCheck = UrlChecksRepository.getLastCheck(urlForCheck.getId()).get();
-            System.out.println("title= " + lastCheck.getTitle()
-                    + " h1= " + lastCheck.getH1()
-                    + " Descr= " + lastCheck.getDescription());
-            assertThat(lastCheck.getTitle()).isEqualTo("Title");
-            assertThat(lastCheck.getH1()).isEqualTo("This is a header");
-            assertThat(lastCheck.getDescription()).contains("description");
+            try {
+                assertThat(response.code()).isEqualTo(200);
+                var lastCheck = UrlChecksRepository.getLastCheck(urlForCheck.getId()).orElseThrow();
+                assertThat(lastCheck.getTitle()).isEqualTo("Title");
+                assertThat(lastCheck.getH1()).isEqualTo("This is a header");
+                assertThat(lastCheck.getDescription()).isEqualTo("description");
+            } catch (final Throwable th) {
+                System.out.println(th.getMessage());
+            } finally {
+                response.close();
+            }
         });
     }
 

@@ -7,6 +7,7 @@ import hexlet.code.repository.UrlsRepository;
 import org.jsoup.Jsoup;
 
 import java.sql.SQLException;
+import java.util.Objects;
 
 import kong.unirest.Unirest;
 import org.jsoup.nodes.Document;
@@ -25,11 +26,12 @@ public class UrlChecksController {
         try {
             var response = Unirest.get(name).asString();
             Document doc = Jsoup.parse(response.getBody());
-            var h1 = doc.getElementsByTag("h1").isEmpty()
-                    ? "" : doc.getElementsByTag("h1").html();
+            var title = doc.title();
+            var h1 = Objects.requireNonNull(doc.selectFirst("h1")).getElementsByTag("h1").isEmpty()
+                    ? "" : Objects.requireNonNull(doc.selectFirst("h1")).getElementsByTag("h1").html();
             var metaTags = doc.getElementsByAttributeValue("name", "description");
             var description = metaTags.isEmpty() ? "" : metaTags.get(0).attr("content");
-            var check = new UrlCheck(urlId, response.getStatus(), h1, doc.title(), description);
+            var check = new UrlCheck(urlId, response.getStatus(), h1, title, description);
             saveCheck(check);
             ctx.sessionAttribute("flashType", "success");
             ctx.sessionAttribute("flash", "Страница успешно проверена");
