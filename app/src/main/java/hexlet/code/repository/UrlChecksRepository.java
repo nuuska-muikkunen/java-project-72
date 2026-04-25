@@ -80,8 +80,8 @@ public class UrlChecksRepository extends BaseRepository {
     }
 
     public static LinkedHashMap<Url, UrlCheck> getUrlsWithLastChecks() throws SQLException {
-        var urls = UrlsRepository.getEntities();
         LinkedHashMap<Url, UrlCheck> outputMap = new LinkedHashMap<>();
+        var urls = UrlsRepository.getEntities();
         urls.stream()
                 .peek(u -> {
                     try {
