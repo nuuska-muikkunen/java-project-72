@@ -26,10 +26,9 @@ jobs:
           build-root-directory: app
       - name: Publish code coverage
         if: ${{ github.event_name == 'push' }}
-        uses: paambaati/codeclimate-action@v9.0.0
-        env:
-          CC_TEST_REPORTER_ID: ${{secrets.CC_TEST_REPORTER_ID}}
-          JACOCO_SOURCE_PATH: ${{github.workspace}}/app/src/main/java
+        uses: qltysh/qlty-action/coverage@v2
         with:
-          coverageCommand: mvn test
+          token: ${{ secrets.QLTY_COVERAGE_TOKEN }}
+          files: reports/coverage.xml
+          JACOCO_SOURCE_PATH: ${{github.workspace}}/app/src/main/java
           coverageLocations: ${{github.workspace}}/app/build/reports/jacoco/test/jacoco.xml:jacoco
